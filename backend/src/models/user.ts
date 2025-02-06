@@ -1,20 +1,9 @@
 import { Model, DataTypes, Optional } from "sequelize";
 import sequelize from "../config/database";
+import { UserAttributes, UserCreationAttributes } from "../types/user.types";
 
-// Define UserAttributes
-interface UserAttributes {
-    user_id: number; // Primary key
-    user_name: string;
-    email: string;
-    password: string;
-}
-
-// Define UserCreationAttributes 
-interface UserCreationAttributes extends Optional<UserAttributes, "user_id"> { }
-
-// Extend Sequelize's Model to include the attributes
 class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
-    public user_id!: number; // Primary key (non-nullable)
+    public user_id!: number; 
     public user_name!: string;
     public email!: string;
     public password!: string;
@@ -23,7 +12,7 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
     public readonly updatedAt!: Date;
 }
 
-// Initialize the model
+
 User.init(
     {
         user_id: {
@@ -46,10 +35,10 @@ User.init(
         },
     },
     {
-        sequelize, // Pass the Sequelize instance
+        sequelize, 
         modelName: "User",
         tableName: "Users",
-        timestamps: true, // Enable createdAt and updatedAt
+        timestamps: true, 
     }
 );
 

@@ -2,14 +2,7 @@ import { DataTypes, Model, Optional } from 'sequelize';
 import sequelize from '../config/database';
 import Genre from './genre';
 import Movie from './movie';
-
-interface MoviesGenresAttributes {
-    moviesgenres_id: number;
-    genres_id: number;
-    movie_id: number;
-}
-
-export interface MoviesGenresCreationAttributes extends Optional<MoviesGenresAttributes, 'moviesgenres_id'> { }
+import { MoviesGenresAttributes, MoviesGenresCreationAttributes } from "../types/moviesGenres.types";
 
 class MoviesGenres extends Model<MoviesGenresAttributes, MoviesGenresCreationAttributes>
     implements MoviesGenresAttributes {
