@@ -1,7 +1,31 @@
-import { DataTypes, Model } from "sequelize";
+import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "../config/database";
 
-class Movie extends Model { }
+interface MovieAttributes {
+    movie_id: number;
+    user_id: number;
+    movie_title: string;
+    movie_img: string;
+    movie_desc: string;
+    release_year: number;
+    director_name: string;
+    duration_minutes: number;
+    producer_name: string;
+}
+
+export interface MovieCreationAttributes extends Optional<MovieAttributes, 'movie_id'> { }
+
+class Movie extends Model<MovieAttributes, MovieCreationAttributes> implements MovieAttributes {
+    movie_id!: number;
+    user_id!: number;
+    movie_title!: string;
+    movie_img!: string;
+    movie_desc!: string;
+    release_year!: number;
+    director_name!: string;
+    duration_minutes!: number;
+    producer_name!: string;
+}
 
 Movie.init(
     {
@@ -13,6 +37,7 @@ Movie.init(
         user_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
+            references: { model: 'Users', key: 'user_id' }, // Foreign key to Users
         },
         movie_title: {
             type: DataTypes.STRING(100),
@@ -46,9 +71,8 @@ Movie.init(
     },
     {
         sequelize,
-        modelName: "Movie",
         tableName: "Movies",
-        timestamps: false,
+        underscored: true,
     }
 );
 
