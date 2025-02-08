@@ -1,18 +1,8 @@
-import { DataTypes, Model, Optional } from "sequelize";
-import sequelize from "../config/database";
-import { MovieAttributes, MovieCreationAttributes } from "../types/movie.types";
+import { DataTypes, Model } from "sequelize";
+import sequelize from "./sequelize";
+import { MovieAttributes, MovieCreationAttributes } from "../types/movie.type";
 
-class Movie extends Model<MovieAttributes, MovieCreationAttributes> implements MovieAttributes {
-    movie_id!: number;
-    user_id!: number;
-    movie_title!: string;
-    movie_img!: string;
-    movie_desc!: string;
-    release_year!: number;
-    director_name!: string;
-    duration_minutes!: number;
-    producer_name!: string;
-}
+class Movie extends Model<MovieAttributes, MovieCreationAttributes> { }
 
 Movie.init(
     {
@@ -24,42 +14,33 @@ Movie.init(
         user_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            references: { model: 'Users', key: 'user_id' }, // Foreign key to Users
         },
-        movie_title: {
-            type: DataTypes.STRING(100),
-            allowNull: false,
+        title: {
+            type: DataTypes.STRING(50),
             unique: true,
-        },
-        movie_img: {
-            type: DataTypes.TEXT,
             allowNull: false,
         },
-        movie_desc: {
+        img: {
             type: DataTypes.TEXT,
-            allowNull: false,
         },
-        release_year: {
+        desc: {
+            type: DataTypes.TEXT,
+        },
+        release_yr: {
             type: DataTypes.SMALLINT,
             allowNull: false,
         },
-        director_name: {
-            type: DataTypes.STRING(50),
-            allowNull: false,
-        },
-        duration_minutes: {
+        length: {
             type: DataTypes.SMALLINT,
-            allowNull: false,
         },
-        producer_name: {
+        producer: {
             type: DataTypes.STRING(50),
-            allowNull: false,
         },
     },
     {
         sequelize,
         tableName: "Movies",
-        underscored: true,
+        timestamps: false,
     }
 );
 

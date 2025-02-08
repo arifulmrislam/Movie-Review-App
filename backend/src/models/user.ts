@@ -1,44 +1,31 @@
-import { Model, DataTypes, Optional } from "sequelize";
-import sequelize from "../config/database";
-import { UserAttributes, UserCreationAttributes } from "../types/user.types";
+import { DataTypes, Model } from "sequelize";
+import sequelize from "./sequelize";
 
-class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
-    public user_id!: number; 
-    public user_name!: string;
-    public email!: string;
-    public password!: string;
-
-    public readonly createdAt!: Date;
-    public readonly updatedAt!: Date;
-}
-
+class User extends Model { }
 
 User.init(
     {
         user_id: {
             type: DataTypes.INTEGER,
-            autoIncrement: true,
             primaryKey: true,
+            autoIncrement: true,
         },
-        user_name: {
+        name: {
             type: DataTypes.STRING(50),
-            allowNull: false,
         },
         email: {
-            type: DataTypes.STRING(255),
-            allowNull: false,
+            type: DataTypes.STRING(50),
             unique: true,
+            allowNull: false,
         },
         password: {
-            type: DataTypes.STRING(255),
-            allowNull: false,
+            type: DataTypes.STRING(50),
         },
     },
     {
-        sequelize, 
-        modelName: "User",
+        sequelize,
         tableName: "Users",
-        timestamps: true, 
+        timestamps: false,
     }
 );
 

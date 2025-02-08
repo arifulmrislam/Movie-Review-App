@@ -1,29 +1,25 @@
-import { DataTypes, Model, Optional } from 'sequelize';
-import sequelize from '../config/database';
-import { GenreAttributes, GenreCreationAttributes } from "../types/genre.types";
+import { DataTypes, Model } from "sequelize";
+import sequelize from "./sequelize";
 
-class Genre extends Model<GenreAttributes, GenreCreationAttributes> implements GenreAttributes {
-    genres_id!: number;
-    genre!: string;
-}
+class Genre extends Model { }
 
 Genre.init(
     {
-        genres_id: {
+        genre_id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
-            autoIncrement: true, 
+            autoIncrement: true,
         },
         genre: {
-            type: DataTypes.STRING(10), 
+            type: DataTypes.STRING(10),
             unique: true,
             allowNull: false,
         },
     },
     {
         sequelize,
-        tableName: 'Genres',
-        underscored: true,
+        tableName: "Genres",
+        timestamps: false,
     }
 );
 

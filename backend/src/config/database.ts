@@ -1,17 +1,10 @@
-import { Sequelize } from "sequelize";
-import dotenv from "dotenv";
+const dbConfig = {
+    DB_NAME: "MovieReviewApp",
+    DB_USERNAME: "postgres",
+    DB_PASSWORD: "123456789",
+    DB_HOST: "127.0.0.1",
+    dialect: "postgres",
+    DB_PORT: 5432
+};
 
-dotenv.config();
-
-const sequelize = new Sequelize(
-    process.env.DB_NAME || "postgres",
-    process.env.DB_USER || "postgres",
-    process.env.DB_PASSWORD || '123456789',
-    {
-        host: process.env.DB_HOST || "127.0.0.1",
-        port: Number(process.env.DB_PORT) || 5432,
-        dialect: "postgres",
-    }
-);
-
-export default sequelize;
+export default dbConfig;

@@ -1,48 +1,37 @@
-import { DataTypes, Model, Optional } from 'sequelize';
-import sequelize from '../config/database';
-import Movie from './movie';
-import User from './user';
-import { ReviewAttributes, ReviewCreationAttributes } from "../types/review.types";
+import { DataTypes, Model } from "sequelize";
+import sequelize from "./sequelize";
 
-class Review extends Model<ReviewAttributes, ReviewCreationAttributes> implements ReviewAttributes {
-    review_id!: number;
-    movie_id!: number;
-    user_id!: number;
-    rating!: number;
-    comment!: string;
-}
+class RR extends Model { }
 
-Review.init(
+RR.init(
     {
-        review_id: {
+        rr_id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
-            autoIncrement: true, 
+            autoIncrement: true,
         },
         movie_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            references: { model: 'Movies', key: 'movie_id' }, 
         },
         user_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            references: { model: 'Users', key: 'user_id' }, 
         },
         rating: {
-            type: DataTypes.DECIMAL(3, 2), 
+            type: DataTypes.REAL,
             allowNull: false,
         },
-        comment: {
+        review: {
             type: DataTypes.TEXT,
-            allowNull: true,
         },
     },
     {
         sequelize,
-        tableName: 'Reviews',
-        underscored: true,
+        tableName: "Reviews&Ratings",
+        timestamps: false,
     }
 );
 
-export default Review;
+
+export default RR;

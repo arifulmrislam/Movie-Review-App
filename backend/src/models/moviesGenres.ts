@@ -1,39 +1,32 @@
-import { DataTypes, Model, Optional } from 'sequelize';
-import sequelize from '../config/database';
-import Genre from './genre';
-import Movie from './movie';
-import { MoviesGenresAttributes, MoviesGenresCreationAttributes } from "../types/moviesGenres.types";
+import { DataTypes, Model } from "sequelize";
+import sequelize from "./sequelize";
 
-class MoviesGenres extends Model<MoviesGenresAttributes, MoviesGenresCreationAttributes>
-    implements MoviesGenresAttributes {
-    moviesgenres_id!: number;
-    genres_id!: number;
-    movie_id!: number;
+class MG extends Model {
+    public movie_id!: number;
+    public genre_id!: number;
 }
 
-MoviesGenres.init(
+MG.init(
     {
-        moviesgenres_id: {
+        mg_id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
-            autoIncrement: true, 
-        },
-        genres_id: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            references: { model: 'Genres', key: 'genres_id' }, 
+            autoIncrement: true,
         },
         movie_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            references: { model: 'Movies', key: 'movie_id' }, 
+        },
+        genre_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
         },
     },
     {
         sequelize,
-        tableName: 'MoviesGenres',
-        underscored: true,
+        tableName: "Movies_Genres",
+        timestamps: false,
     }
 );
 
-export default MoviesGenres;
+export default MG;

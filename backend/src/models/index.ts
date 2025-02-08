@@ -1,21 +1,41 @@
-import sequelize from '../config/database';
-import User from './user';
-import Movie from './movie';
-import Review from './review';
-import Genre from './genre';
-import MoviesGenres from './moviesGenres';
+import { Sequelize } from 'sequelize';
+import sequelize from './sequelize';
+import { DB } from '../interfaces/databaseInterface';
+import Movie from "./movie";
+import RR from "./review";
+import Genre from "./genre";
+import MG from "./moviesGenres";
 
-// Associations
-User.hasMany(Movie, { foreignKey: 'user_id' });
-Movie.belongsTo(User, { foreignKey: 'user_id' });
+const db: DB = {
+    Sequelize,
+    sequelize,
+};
 
-Movie.hasMany(Review, { foreignKey: 'movie_id' });
-Review.belongsTo(Movie, { foreignKey: 'movie_id' });
+db.Movie = Movie;
+db.RR = RR;
+db.Genre = Genre;
+db.MG = MG;
 
-Review.belongsTo(User, { foreignKey: 'user_id' });
-User.hasMany(Review, { foreignKey: 'user_id' });
+db.Movie.hasMany(db.RR, { foreignKey: 'movie_id', as: 'ratingsReviews' });
+db.RR.belongsTo(db.Movie, { foreignKey: 'movie_id', onDelete: 'CASCADE' });
 
-Movie.belongsToMany(Genre, { through: MoviesGenres, foreignKey: 'movie_id' });
-Genre.belongsToMany(Movie, { through: MoviesGenres, foreignKey: 'genres_id' });
+db.Movie.hasMany(db.MG, { foreignKey: 'movie_id' });
+db.MG.belongsTo(db.Movie, { foreignKey: 'movie_id', onDelete: 'CASCADE' });
 
-export { sequelize, User, Movie, Review, Genre, MoviesGenres };
+db.Genre.hasMany(db.MG, { foreignKey: 'genre_id' });
+db.MG.belongsTo(db.Genre, { foreignKey: 'genre_id', onDelete: 'CASCADE' });
+
+db.Movie.belongsToMany(db.Genre, {
+    through: db.MG,
+    foreignKey: 'movie_id',
+    as: 'genres',
+    timestamps: false
+});
+
+db.Genre.belongsToMany(db.Movie, {
+    through: db.MG,
+    foreignKey: 'genre_id',
+    timestamps: false
+});
+
+export default db;
