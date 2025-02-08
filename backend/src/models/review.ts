@@ -28,7 +28,7 @@ RR.init(
     },
     {
         sequelize,
-        tableName: "Reviews&Ratings",
+        tableName: "Reviews_Ratings",
         timestamps: false,
     }
 );

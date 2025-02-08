@@ -20,7 +20,6 @@ export const createMovie: RequestHandler = async (
         img,
         desc,
         release_yr,
-        director,
         length,
         producer,
         genre,
@@ -30,7 +29,7 @@ export const createMovie: RequestHandler = async (
         const transaction = await sequelize.transaction();
         try {
             const movie = await Movie.create(
-                { user_id, title, img, desc, release_yr, director, length, producer },
+                { user_id, title, img, desc, release_yr, length, producer },
                 { transaction }
             );
 
