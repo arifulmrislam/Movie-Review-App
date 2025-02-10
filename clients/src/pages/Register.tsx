@@ -82,7 +82,7 @@ const Register: React.FC = () => {
     // };
 
     return (
-        <div className='min-h-screen w-full bg-gray-50 flex items-center justify-center p-4'>
+        <div className='min-h-auto w-full bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-4'>
             <div className='w-full max-w-md bg-white rounded-lg shadow-lg p-8 transform transition-all'>
                 <div className='flex flex-col items-center mb-8'>
                     <div className='h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center mb-4'>

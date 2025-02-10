@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -43,6 +43,12 @@ export default function Hero() {
         setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
     };
 
+    useEffect(() => {
+        const interval = setInterval(nextSlide, 5000);
+
+        return () => clearInterval(interval);
+    }, []);
+
     return (
         <div className='relative h-[400px] overflow-hidden bg-gray-900'>
             <div
@@ -77,13 +83,15 @@ export default function Hero() {
             </div>
             <button
                 onClick={prevSlide}
-                className='absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 p-2 rounded-full text-white transition-colors'
+                className={`absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 p-2 rounded-full text-white transition-colors ${currentSlide === 0 ? 'bg-red-500' : ''
+                    }`}
             >
                 <ChevronLeft className='h-6 w-6' />
             </button>
             <button
                 onClick={nextSlide}
-                className='absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 p-2 rounded-full text-white transition-colors'
+                className={`absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 p-2 rounded-full text-white transition-colors ${currentSlide === slides.length - 1 ? 'bg-red-500' : ''
+                    }`}
             >
                 <ChevronRight className='h-6 w-6' />
             </button>
@@ -92,7 +100,7 @@ export default function Hero() {
                     <button
                         key={index}
                         onClick={() => setCurrentSlide(index)}
-                        className={`w-2 h-2 rounded-full transition-colors ${index === currentSlide ? 'bg-white' : 'bg-white/50'
+                        className={`w-2 h-2 rounded-full transition-colors ${index === currentSlide ? 'bg-red-500' : 'bg-white/50'
                             }`}
                     />
                 ))}

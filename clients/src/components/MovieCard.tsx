@@ -39,7 +39,7 @@ const MovieCard: React.FC<MovieCardProps> = ({
                 </div>
                 <h3 className='font-medium text-sm mt-1 line-clamp-2'>{title}</h3>
                 <button className='mt-2 text-xs border border-gray-300 rounded px-3 py-1 hover:bg-gray-100 transition-colors'>
-                    WATCH(LIST)
+                    WATCHLIST
                 </button>
             </div>
         </div>
