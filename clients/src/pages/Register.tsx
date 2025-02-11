@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const Register: React.FC = () => {
+    const [username, setUsername] = useState(''); 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -20,66 +21,12 @@ const Register: React.FC = () => {
             return;
         }
         try {
-            await register(email, password);
+            await register(username, email, password);
             navigate('/');
         } catch (error) {
             console.error('Registration failed:', error);
         }
     };
-
-    //     return (
-    //         <div className='max-w-md mx-auto'>
-    //             <h1 className='text-3xl font-bold mb-6'>Register</h1>
-    //             <form onSubmit={handleSubmit}>
-    //                 <div className='mb-4'>
-    //                     <label htmlFor='email' className='block mb-2'>
-    //                         Email:
-    //                     </label>
-    //                     <input
-    //                         type='email'
-    //                         id='email'
-    //                         value={email}
-    //                         onChange={(e) => setEmail(e.target.value)}
-    //                         required
-    //                         className='w-full px-3 py-2 border rounded-md'
-    //                     />
-    //                 </div>
-    //                 <div className='mb-4'>
-    //                     <label htmlFor='password' className='block mb-2'>
-    //                         Password:
-    //                     </label>
-    //                     <input
-    //                         type='password'
-    //                         id='password'
-    //                         value={password}
-    //                         onChange={(e) => setPassword(e.target.value)}
-    //                         required
-    //                         className='w-full px-3 py-2 border rounded-md'
-    //                     />
-    //                 </div>
-    //                 <div className='mb-4'>
-    //                     <label htmlFor='confirmPassword' className='block mb-2'>
-    //                         Confirm Password:
-    //                     </label>
-    //                     <input
-    //                         type='password'
-    //                         id='confirmPassword'
-    //                         value={confirmPassword}
-    //                         onChange={(e) => setConfirmPassword(e.target.value)}
-    //                         required
-    //                         className='w-full px-3 py-2 border rounded-md'
-    //                     />
-    //                 </div>
-    //                 <button
-    //                     type='submit'
-    //                     className='bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600'
-    //                 >
-    //                     Register
-    //                 </button>
-    //             </form>
-    //         </div>
-    //     );
-    // };
 
     return (
         <div className='min-h-auto w-full bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-4'>
@@ -92,6 +39,23 @@ const Register: React.FC = () => {
                     <p className='text-gray-600 mt-2'>Join us today!</p>
                 </div>
                 <form onSubmit={handleSubmit} className='space-y-6'>
+                    <div>
+                        <label
+                            htmlFor='username'
+                            className='block text-sm font-medium text-gray-700 mb-2'
+                        >
+                            Username
+                        </label>
+                        <input
+                            type='text'
+                            id='username'
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            required
+                            className='w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors'
+                            placeholder='Enter your username'
+                        />
+                    </div>
                     <div>
                         <label
                             htmlFor='email'
@@ -159,5 +123,5 @@ const Register: React.FC = () => {
             </div>
         </div>
     );
-}
+};
 export default Register;

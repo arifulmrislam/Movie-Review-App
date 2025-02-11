@@ -1,5 +1,6 @@
 'use client';
 
+import axios from 'axios';
 import type React from 'react';
 import { createContext, useState, useContext, useEffect } from 'react';
 
@@ -31,11 +32,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }, []);
 
     const login = async (email: string, password: string) => {
-        // Implement your login logic here
-        // For now, we'll just set a mock user
-        const mockUser = { id: '1', email };
-        setUser(mockUser);
-        localStorage.setItem('user', JSON.stringify(mockUser));
+        try {
+            const response = await axios.post('http://localhost:3000/api/user/', { email, password });
+            const userData = response.data;
+            setUser(userData);
+            localStorage.setItem('user', JSON.stringify(userData));
+        } catch (error) {
+            console.error('Login failed:', error);
+        }
     };
 
     const logout = () => {
@@ -43,12 +47,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         localStorage.removeItem('user');
     };
 
-    const register = async (email: string, password: string) => {
-        // Implement your registration logic here
-        // For now, we'll just set a mock user
-        const mockUser = { id: '1', email };
-        setUser(mockUser);
-        localStorage.setItem('user', JSON.stringify(mockUser));
+    const register = async (name: string, email: string, password: string) => {
+        try {
+            const response = await axios.post('http://localhost:3000/api/user/signup', {
+            name,    
+            email,
+            password,
+            });
+            const userData = response.data;
+            setUser(userData);
+            localStorage.setItem('user', JSON.stringify(userData));
+        } catch (error) {
+            console.error('Register failed:', error);
+        }
     };
 
     return (

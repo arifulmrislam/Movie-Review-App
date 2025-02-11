@@ -38,4 +38,12 @@ db.Genre.belongsToMany(db.Movie, {
     timestamps: false
 });
 
+// const syncData =async () => {
+//     await sequelize.sync({
+//         force: true
+//     })
+// }
+// 
+// syncData();
+
 export default db;

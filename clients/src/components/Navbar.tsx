@@ -2,7 +2,7 @@ import type React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Search } from 'lucide-react';
-import logo from '../../public/logo-6-Photoroom.png';
+import logo from '../assets/logo-6-Photoroom.png';
 
 const Navbar: React.FC = () => {
     const { user, logout } = useAuth();
