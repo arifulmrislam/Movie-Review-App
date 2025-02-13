@@ -1,17 +1,17 @@
-// /middlewares/multerConfig.ts
-import multer from "multer";
-import path from "path";
+import jwt from 'jsonwebtoken';
+import { Request, Response, NextFunction } from 'express';
 
-// Configure Multer
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        const uploadPath = path.join(__dirname, "../../uploads");
-        cb(null, uploadPath); // Directory to save the files
-    },
-    filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-        cb(null, uniqueSuffix + path.extname(file.originalname)); // Unique filename
-    },
-});
+const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
+    const token = req.headers.authorization?.split(' ')[1]; //extracts token from Bearer token
+    if (!token) return res.status(401).send('Access denied. No token provided.');
 
-export const upload = multer({ storage });
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = decoded;
+        next();
+    } catch (ex) {
+        res.status(400).send('Invalid token.');
+    }
+};
+
+export default authenticateToken;

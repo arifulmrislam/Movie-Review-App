@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { upload } from "../middlewares/authMiddleware";
+import { upload } from "../middlewares/fileUploadMiddleware";
 
 export const uploadImage = (req: Request, res: Response) => {
     upload.single("image")(req, res, (err) => {

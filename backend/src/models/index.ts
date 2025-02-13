@@ -39,9 +39,14 @@ db.Genre.belongsToMany(db.Movie, {
 });
 
 // const syncData =async () => {
-//     await sequelize.sync({
-//         force: true
-//     })
+//     try {
+//         await sequelize.sync({
+//             force: true
+//         });
+//     } catch (error) {
+//         console.log(error)
+//     }
+// 
 // }
 // 
 // syncData();

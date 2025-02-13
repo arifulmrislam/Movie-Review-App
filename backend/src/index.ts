@@ -7,6 +7,11 @@ import reviewRoute from "./routes/reviewRoutes";
 import genreRoute from "./routes/genreRoutes";
 import uploadRoute from "./routes/uploadRoutes";
 import express, { Express } from "express";
+import dotenv from "dotenv";
+
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
+
+// console.log("JWT_SECRET:", process.env.JWT_SECRET);
 
 const app: Express = express();
 const port = 3000;

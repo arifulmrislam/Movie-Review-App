@@ -7,27 +7,30 @@ import EditMovie from './pages/EditMovie';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Navbar from './components/Navbar';
+import { ToastContainer } from 'react-toastify'; 
+import 'react-toastify/dist/ReactToastify.css'; 
 
 function App() {
-    return (
-        <AuthProvider>
-            <Router>
-                <div className='min-h-screen bg-gray-100'>
-                    <Navbar />
-                    <main className='container mx-auto px-4 py-8'>
-                        <Routes>
-                            <Route path='/' element={<Home />} />
-                            <Route path='/movies/:id' element={<MoviePage />} />
-                            <Route path='/add-movie' element={<AddMovie />} />
-                            <Route path='/edit-movie/:id' element={<EditMovie />} />
-                            <Route path='/login' element={<Login />} />
-                            <Route path='/register' element={<Register />} />
-                        </Routes>
-                    </main>
-                </div>
-            </Router>
-        </AuthProvider>
-    );
+  return (
+    <AuthProvider>
+      <Router>
+        <div className='min-h-screen bg-gray-100'>
+          <Navbar />
+            <ToastContainer />
+          <main className='container mx-auto px-4 py-8'>
+            <Routes>
+              <Route path='/' element={<Home />} />
+              <Route path='/movies/:id' element={<MoviePage />} />
+              <Route path='/add-movie' element={<AddMovie />} />
+              <Route path='/edit-movie/:id' element={<EditMovie />} />
+              <Route path='/login' element={<Login />} />
+              <Route path='/register' element={<Register />} />
+            </Routes>
+          </main>
+        </div>
+      </Router>
+    </AuthProvider>
+  );
 }
 
 export default App;

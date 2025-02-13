@@ -1,7 +1,25 @@
-import { DataTypes, Model } from "sequelize";
+import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "./sequelize";
+import { sign } from "jsonwebtoken";
 
-class User extends Model { }
+const bcrypt = require("bcryptjs") as typeof import("bcryptjs");
+
+class User extends Model {
+    public user_id!: number;
+    public name!: string;
+    public email!: string;
+    public password!: string;
+
+    async validatePassword(password: string): Promise<boolean> {
+        return await bcrypt.compare(password, this.password);
+    }
+
+    generateToken(): string {
+        return sign({ id: this.user_id }, process.env.JWT_SECRET as string, {
+            expiresIn: "1h",
+        });
+    }
+}
 
 User.init(
     {
@@ -19,7 +37,8 @@ User.init(
             allowNull: false,
         },
         password: {
-            type: DataTypes.STRING(50),
+            type: DataTypes.STRING(255),
+            allowNull: false,
         },
     },
     {
@@ -28,5 +47,12 @@ User.init(
         timestamps: false,
     }
 );
+
+// Hash password before saving to database
+User.addHook("beforeCreate", async (user: User) => {
+    if (user.changed("password")) {
+        user.password = await bcrypt.hash(user.password, 8);
+    }
+});
 
 export default User;
