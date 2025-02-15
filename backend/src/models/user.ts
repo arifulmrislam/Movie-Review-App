@@ -16,7 +16,7 @@ class User extends Model {
 
     generateToken(): string {
         return sign({ id: this.user_id }, process.env.JWT_SECRET as string, {
-            expiresIn: "1h",
+            expiresIn: "7d",
         });
     }
 }

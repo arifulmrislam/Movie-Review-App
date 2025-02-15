@@ -10,62 +10,73 @@ const Genre = db.Genre;
 const MG = db.MG;
 const RR = db.RR;
 
-export const createMovie: RequestHandler = async (
-    req: Request,
-    res: Response
-) => {
-    const {
-        user_id,
-        title,
-        img,
-        desc,
-        release_yr,
-        length,
-        producer,
-        genre,
-    } = req.body;
+interface AuthenticatedRequest extends Request {
+    user?: { id: number }; // Adjust based on your JWT payload structure
+}
+
+export const createMovie = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const { title, img, desc, release_yr, length, producer, genre } = req.body;
+
+    if (!req.user?.id) {
+        res.status(401).json({ error: "User not authenticated" });
+        return;
+    }
+
+    if (!title || !desc || !release_yr || !length || !producer || !Array.isArray(genre)) {
+        res.status(400).json({ error: "Invalid request data. Ensure all required fields are provided." });
+        return;
+    }
+
+    const user_id = req.user.id;
 
     try {
+        const existingMovie = await Movie.findOne({ where: { title } });
+        if (existingMovie) {
+            res.status(400).json({ error: `A movie with the title '${title}' already exists.` });
+            return;
+        }
+
         const transaction = await sequelize.transaction();
         try {
+            // ✅ Creating the Movie record
             const movie = await Movie.create(
                 { user_id, title, img, desc, release_yr, length, producer },
                 { transaction }
             );
 
-            if (!movie.dataValues.movie_id) {
+            if (!movie.movie_id) {
                 throw new Error("Movie ID is null after creation");
             }
 
+            // ✅ Ensure genre is an array before using map()
             const genreInstances = await Promise.all(
                 genre.map(async (g: string) =>
                     Genre.findOrCreate({ where: { genre: g }, transaction })
                 )
             );
 
+            // ✅ Corrected movie-genre associations
             const movieGenreAssociations = genreInstances.map(([genreInstance]) => ({
-                movie_id: movie.dataValues.movie_id,
-                genre_id: genreInstance.genre_id,
+                movie_id: movie.movie_id,
+                genre_id: genreInstance.getDataValue("genre_id"),
             }));
 
             await MG.bulkCreate(movieGenreAssociations, { transaction });
+
             await transaction.commit();
 
             res.status(201).json({ message: "Movie created successfully", movie });
         } catch (error) {
             await transaction.rollback();
-            throw error;
-        }
-    } catch (error:any) {
-        if (error.errors && error.errors[0].message == 'title must be unique') {
-            console.error("Error during movie creation:", error);
-            res.status(400).json({ error: "title must be unique" });
-        } else {
-            console.error("Error during movie creation:", error);
+            console.error("Transaction rolled back due to error:", error);
             res.status(500).json({ error: "Failed to create movie" });
         }
+    } catch (error) {
+        console.error("Error during movie creation:", error);
+        res.status(500).json({ error: "Failed to create movie" });
     }
 };
+
 
 export const getMovieById: RequestHandler = async (
     req: Request,
