@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import MovieList from '../components/MovieList';
 import Hero from '../components/Hero';
 import axios from 'axios';
+import { randomlySelectMovies } from '../utils/utils';
 
 const Home: React.FC = () => {
     const [movies, setMovies] = useState([]);
@@ -34,7 +35,7 @@ const Home: React.FC = () => {
 
         return (
         <div className='-mx-4'>
-            <Hero />
+            <Hero movies={randomlySelectMovies (movies, 5)}/>
             <div className='container mx-auto px-4'>
                 <MovieList title='MOVIE LIST' movies={movies} />
             </div>
