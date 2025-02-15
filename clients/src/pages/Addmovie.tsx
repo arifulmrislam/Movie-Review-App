@@ -28,9 +28,11 @@ const AddMovie: React.FC = () => {
     }
 
     return (
-        <div className='min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8'>
+        <div className='min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 py-12 px-4 sm:px-6 lg:px-8'>
             <div className='max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-sm'>
-                <h1 className='text-3xl font-bold mb-8 text-gray-900'>Add New Movie</h1>
+                <h1 className='text-3xl font-bold mb-8 text-gray-900'>
+                    Add New Movie
+                </h1>
                 <form onSubmit={handleSubmit} className='space-y-6'>
                     <div>
                         <label
@@ -45,7 +47,7 @@ const AddMovie: React.FC = () => {
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             required
-                            className='w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors'
+                            className='block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg'
                         />
                     </div>
                     <div>
@@ -60,7 +62,7 @@ const AddMovie: React.FC = () => {
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             required
-                            className='w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors'
+                            className='block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg'
                             rows={4}
                         ></textarea>
                     </div>
@@ -77,7 +79,7 @@ const AddMovie: React.FC = () => {
                             value={releaseDate}
                             onChange={(e) => setReleaseDate(e.target.value)}
                             required
-                            className='w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors'
+                            className='block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg'
                         />
                     </div>
                     <div>
@@ -93,7 +95,7 @@ const AddMovie: React.FC = () => {
                             value={publisher}
                             onChange={(e) => setPublisher(e.target.value)}
                             required
-                            className='w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors'
+                            className='block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg'
                         />
                     </div>
                     <div>
@@ -109,7 +111,7 @@ const AddMovie: React.FC = () => {
                             value={imageUrl}
                             onChange={(e) => setImageUrl(e.target.value)}
                             required
-                            className='w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors'
+                            className='block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg'
                         />
                     </div>
                     <button
