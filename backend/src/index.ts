@@ -23,7 +23,7 @@ app.use("/api/movie", movieRoute);
 app.use("/api/review", reviewRoute);
 app.use("/api/genre", genreRoute);
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
-app.use("/upload", uploadRoute);
+app.use("/api/upload", uploadRoute);
 
 sequelize.sync({ alter: true }).then(() => {
     app.listen(port, () => {
