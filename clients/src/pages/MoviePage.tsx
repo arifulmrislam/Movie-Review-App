@@ -25,46 +25,81 @@ const MoviePage: React.FC = () => {
     const [rating, setRating] = useState(5);
     const [comment, setComment] = useState('');
     useEffect(() => {
-        const mockMovie: Movie = {
-            id: id || '1',
-            title: 'Sample Movie',
-            imageUrl:
-                'https://images.unsplash.com/photo-1485846234645-a62644f84728?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80',
-            description:
-                'This is a sample movie description that would typically contain a brief synopsis of the movie plot and other relevant details about the film.',
-            releaseDate: '2023-01-01',
-            publisher: 'Sample Publisher',
-            averageRating: 4.2,
+        const fetchMovie = async () => {
+            try {
+                const response = await fetch(
+                    `http://localhost:3000/api/movie/${id}`
+                );
+                if (response.ok) {
+                    const data = await response.json();
+
+                    // Map API response to frontend expected format
+                    const formattedMovie: Movie = {
+                        id: data.movie_id.toString(),
+                        title: data.title,
+                        imageUrl: data.img, // Change from `img` to `imageUrl`
+                        description: data.desc, // Change from `desc`
+                        releaseDate: data.release_yr.toString(), // Change from `release_yr`
+                        publisher: data.producer, // Change from `producer`
+                        averageRating: data.rating ?? 0, // Handle null ratings
+                    };
+
+                    setMovie(formattedMovie);
+                } else {
+                    console.error('Failed to fetch movie');
+                }
+            } catch (error) {
+                console.error('Error fetching movie:', error);
+            }
         };
-        setMovie(mockMovie);
-        const mockReviews: Review[] = [
-            {
-                id: '1',
-                rating: 4,
-                comment: 'Great movie!',
-                author: 'User1',
-            },
-            {
-                id: '2',
-                rating: 5,
-                comment: 'Loved it!',
-                author: 'User2',
-            },
-        ];
-        setReviews(mockReviews);
+
+        const fetchReviews = async () => {
+            console.log('Fetching reviews for movie_id:', id);
+            try {
+                const response = await fetch(
+                    `http://localhost:3000/api/review?movie_id=${Number(id)}`
+                );
+                if (!response.ok) {
+                    // const data = await response.json();
+                    // setReviews(data);
+                    throw new Error('Failed to fetch reviews');
+                }
+                    const data = await response.json();
+                    console.log('Fetched reviews:', data);
+
+                    setReviews(data);  // Set the fetched reviews here
+                
+            } catch (error) {
+                console.error('Error fetching reviews:', error);
+            }
+        };
+
+        fetchMovie();
+        fetchReviews();
     }, [id]);
-    const handleReviewSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        const review: Review = {
-            id: String(reviews.length + 1),
-            rating,
-            comment,
-            author: 'Current User', // Replace with actual user name
-        };
-        setReviews([...reviews, review]);
-        setRating(5);
-        setComment('');
-    };
+    const handleReviewSubmit = async () => {
+    try {
+        const response = await fetch('http://localhost:3000/api/review/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                rating,
+                comment,
+                user_id: 1,  // Ensure `currentUser.id` exists
+                movie_id: id        // Ensure `movieId` exists
+            }),
+        });
+
+        if (!response.ok) throw new Error('Failed to submit review');
+        const newReview = await response.json();
+
+        // Update the reviews state to include the new review
+        setReviews((prevReviews) => [...prevReviews, newReview]);
+        console.log('Review submitted successfully!');
+    } catch (error) {
+        console.error('Error submitting review:', error);
+    }
+};
     const renderStars = (rating: number) => {
         return Array.from(
             {
@@ -84,6 +119,14 @@ const MoviePage: React.FC = () => {
     if (!movie) {
         return <div>Loading...</div>;
     }
+
+    const averageReviewScore = reviews.length
+        ? (
+            reviews.reduce((sum, review) => sum + review.rating, 0) /
+            reviews.length
+        ).toFixed(1)
+        : 'N/A';
+
     return (
         <div className='min-h-screen w-full bg-gray-50'>
             <main className='max-w-6xl mx-auto p-6'>
@@ -109,10 +152,7 @@ const MoviePage: React.FC = () => {
                                 </p>
                                 <p className='flex items-center gap-2 text-gray-600'>
                                     <Star className='w-5 h-5 text-yellow-400' />
-                                    <strong>Average Rating:</strong>{' '}
-                                    <span className='text-lg'>
-                                        {movie.averageRating.toFixed(1)}
-                                    </span>
+                                    <strong>Average Rating:</strong> <span className="text-lg">{averageReviewScore}</span>
                                 </p>
                             </div>
                             <p className='text-gray-700 leading-relaxed'>

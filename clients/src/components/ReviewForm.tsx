@@ -21,9 +21,9 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ movieId, onReviewSubmit }) => {
         setComment('');
     };
 
-    if (!user) {
-        return <p>Please log in to leave a review.</p>;
-    }
+    // if (!user) {
+    //     return <p>Please log in to leave a review.</p>;
+    // }
 
     return (
         <form onSubmit={handleSubmit} className='mt-6'>

@@ -13,6 +13,7 @@ RR.init(
         movie_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
+            field: "movie_id",
         },
         user_id: {
             type: DataTypes.INTEGER,
@@ -24,6 +25,7 @@ RR.init(
         },
         review: {
             type: DataTypes.TEXT,
+            allowNull: true,
         },
     },
     {
@@ -32,6 +34,5 @@ RR.init(
         timestamps: false,
     }
 );
-
 
 export default RR;

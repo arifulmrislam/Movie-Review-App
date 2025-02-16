@@ -11,9 +11,9 @@ const AddMovie: React.FC = () => {
     const [releaseDate, setReleaseDate] = useState('');
     const [publisher, setPublisher] = useState('');
     const [imageUrl, setImageUrl] = useState('');
-    const [genre, setGenre] = useState<string[]>([]); // New state for genre
+    const [genre, setGenre] = useState<string[]>([]); 
 
-    const { user, token } = useAuth(); // Assuming you have a token in context
+    const { user, token } = useAuth(); 
     const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -26,12 +26,12 @@ const AddMovie: React.FC = () => {
         }
         // Prepare the movie data
         const movieData = {
-            user_id: user?.id,  // Assuming user object has an id
+            user_id: user?.id, 
             title,
             img: imageUrl,
             desc: description,
             release_yr: new Date(releaseDate).getFullYear(),
-            length: "120",  // Placeholder, can be dynamic
+            length: "120", 
             producer: publisher,
             genre,
         };
@@ -42,14 +42,14 @@ const AddMovie: React.FC = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': token ? `Bearer ${token?.trim()}` : '',  // Pass token for authorization
+                    'Authorization': token ? `Bearer ${token?.trim()}` : '', 
                 },
                 body: JSON.stringify(movieData),
             });
 
             if (!response.ok) {
                 const error = await response.json();
-                console.error('Error:', error); // Log the error message
+                console.error('Error:', error); 
                 throw new Error('Failed to add movie');
             }
 
