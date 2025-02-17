@@ -62,7 +62,10 @@ export const updateReviewById = async (req: Request, res: Response) => {
             return;
         }
 
-        await rr.update(updatedData);
+        await rr.update({
+            rating: updatedData.rating,
+            review: updatedData.review // Ensure `review` column matches
+        });
 
         res.status(200).json(rr);
     } catch (error) {
@@ -77,7 +80,7 @@ export const deleteReviewById = async (req: Request, res: Response) => {
 
         const rr = await RR.destroy({
             where: {
-                rr_id: id
+                rr_id: Number(id)
             }
         });
 
