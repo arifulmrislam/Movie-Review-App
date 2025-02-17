@@ -2,6 +2,7 @@
 import { Request, Response } from "express";
 import db from "../models";
 import Review from "../models/review";
+import User from '../models/user';
 
 const RR = db.RR;
 
@@ -33,10 +34,10 @@ export const createReview = async (req: Request, res: Response): Promise<void> =
 
         // Create the review and save to DB
         const newReview = await RR.create({
-            movie_id: Number(movie_id),  
-            user_id: Number(user_id),   
-            rating: parsedRating,        
-            review: comment || "",   
+            movie_id: Number(movie_id),
+            user_id: Number(user_id),
+            rating: parsedRating,
+            review: comment || "",
         });
 
         console.log("Review saved successfully:", newReview);
@@ -46,6 +47,7 @@ export const createReview = async (req: Request, res: Response): Promise<void> =
         res.status(500).json({ error: "Internal server error" });
     }
 };
+
 
 
 export const updateReviewById = async (req: Request, res: Response) => {
@@ -88,7 +90,7 @@ export const deleteReviewById = async (req: Request, res: Response) => {
 
 export const getReviewsByMovieId = async (req: Request, res: Response): Promise<void> => {
     try {
-        const movie_id = req.query.movie_id || req.query.movieId; // Accept both names for safety
+        const movie_id = req.query.movie_id;
 
         if (!movie_id) {
             res.status(400).json({ message: "movie_id is required" });
@@ -97,7 +99,16 @@ export const getReviewsByMovieId = async (req: Request, res: Response): Promise<
 
         console.log("Fetching reviews for movie_id:", movie_id);  // Debugging log
 
-        const reviews = await RR.findAll({ where: { movie_id: Number(movie_id) } });
+        const reviews = await RR.findAll({
+            where: { movie_id: Number(movie_id) },
+            include: [
+                {
+                    model: User,
+                    attributes: ['name'], 
+                    as: 'user' 
+                }
+            ]
+        });
         res.status(200).json(reviews);
     } catch (error) {
         console.error("Error fetching reviews:", error);

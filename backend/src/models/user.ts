@@ -1,6 +1,7 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "./sequelize";
 import { sign } from "jsonwebtoken";
+import RR from "./review";
 
 const bcrypt = require("bcryptjs") as typeof import("bcryptjs");
 
@@ -30,6 +31,7 @@ User.init(
         },
         name: {
             type: DataTypes.STRING(50),
+            allowNull: true, 
         },
         email: {
             type: DataTypes.STRING(50),
@@ -54,5 +56,8 @@ User.addHook("beforeCreate", async (user: User) => {
         user.password = await bcrypt.hash(user.password, 8);
     }
 });
+
+User.hasMany(RR, { foreignKey: "user_id", as: "reviews" }); 
+RR.belongsTo(User, { foreignKey: "user_id", as: "user" });
 
 export default User;
