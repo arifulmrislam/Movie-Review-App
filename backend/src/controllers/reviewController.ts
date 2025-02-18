@@ -64,7 +64,7 @@ export const updateReviewById = async (req: Request, res: Response) => {
 
         await rr.update({
             rating: updatedData.rating,
-            review: updatedData.review 
+            review: updatedData.review
         });
 
         res.status(200).json(rr);
@@ -100,18 +100,20 @@ export const getReviewsByMovieId = async (req: Request, res: Response): Promise<
             return;
         }
 
-        console.log("Fetching reviews for movie_id:", movie_id);  // Debugging log
+        console.log("Fetching reviews for movie_id:", movie_id);
 
         const reviews = await RR.findAll({
             where: { movie_id: Number(movie_id) },
             include: [
                 {
                     model: User,
-                    attributes: ['name'], 
-                    as: 'user' 
+                    attributes: ['name', 'user_id'], // Ensure user ID is included
+                    as: 'user'
                 }
-            ]
+            ],
+            attributes: ['rr_id', 'movie_id', 'user_id', 'rating', 'review'] // Ensure user_id is returned
         });
+
         res.status(200).json(reviews);
     } catch (error) {
         console.error("Error fetching reviews:", error);
