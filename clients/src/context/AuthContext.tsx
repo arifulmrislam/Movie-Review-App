@@ -116,7 +116,7 @@ export const AuthProvider: React.FC = ({ children }) => {
             localStorage.setItem('token', response.data.token);
         } catch (error) {
             console.error('Login failed:', error);
-            toast.error('Login failed. Please check your credentials.');
+            throw error;
         }
     };
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { User, Send, Edit, Trash } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 interface Review {
     rr_id: number; 
@@ -48,6 +49,7 @@ const MovieReviews: React.FC = () => {
         const token = localStorage.getItem('token');
         if (!token) {
             console.error('User is not logged in.');
+            toast.error('Login first.');
             return;
         }
 

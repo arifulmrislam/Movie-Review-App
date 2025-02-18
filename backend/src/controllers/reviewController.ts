@@ -64,7 +64,7 @@ export const updateReviewById = async (req: Request, res: Response) => {
 
         await rr.update({
             rating: updatedData.rating,
-            review: updatedData.review // Ensure `review` column matches
+            review: updatedData.review 
         });
 
         res.status(200).json(rr);
