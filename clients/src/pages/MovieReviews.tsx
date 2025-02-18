@@ -3,10 +3,10 @@ import { useParams } from 'react-router-dom';
 import { User, Send, Edit, Trash } from 'lucide-react';
 
 interface Review {
-    rr_id: number; // Matches API response
+    rr_id: number; 
     rating: number;
-    review: string; // Matches API response field for comment
-    user: { name: string }; // Ensure user data is properly structured
+    review: string; 
+    user: { name: string };
 }
 
 const MovieReviews: React.FC = () => {
@@ -62,7 +62,7 @@ const MovieReviews: React.FC = () => {
         }
 
         const url = editMode
-            ? `http://localhost:3000/api/review/${reviewToEdit!.rr_id}` // Ensure ID exists
+            ? `http://localhost:3000/api/review/${reviewToEdit!.rr_id}` 
             : 'http://localhost:3000/api/review/';
 
         const method = editMode ? 'PUT' : 'POST';
@@ -73,7 +73,7 @@ const MovieReviews: React.FC = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     rating,
-                    review: comment, // Ensure this matches your database column name
+                    review: comment, 
                     user_id: userId,
                     movie_id: id,
                 }),
@@ -179,7 +179,7 @@ const MovieReviews: React.FC = () => {
                             <div className='flex items-center'>
                                 <User className='w-6 h-6 mr-2 text-gray-600' />
                                 <strong className='text-gray-900'>{review.user?.name}</strong>
-                                <p className='text-gray-600 ml-2'>{review.review}</p>
+                                {/* <p className='text-gray-600 ml-2'>{review.review}</p> */}
                             </div>
                             <div className='flex space-x-3'>
                                 <button

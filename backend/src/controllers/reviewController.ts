@@ -10,15 +10,15 @@ export const createReview = async (req: Request, res: Response): Promise<void> =
     try {
         console.log("Received Data:", req.body);
 
-        const { movie_id, user_id, rating, comment } = req.body;
+        const { movie_id, user_id, rating, review } = req.body;
 
         // Check individual fields
         console.log("Movie ID:", movie_id);
         console.log("User ID:", user_id);
         console.log("Rating:", rating);
-        console.log("Comment:", comment);
+        console.log("review:", review);
 
-        if (!movie_id || !user_id || typeof rating === 'undefined' || comment === null || comment === undefined) {
+        if (!movie_id || !user_id || typeof rating === 'undefined' || review === null || review === undefined) {
             console.error("Validation failed: Missing required fields");
             res.status(400).json({ error: "Missing required fields" });
             return;
@@ -37,7 +37,7 @@ export const createReview = async (req: Request, res: Response): Promise<void> =
             movie_id: Number(movie_id),
             user_id: Number(user_id),
             rating: parsedRating,
-            review: comment || "",
+            review: review || "",
         });
 
         console.log("Review saved successfully:", newReview);
