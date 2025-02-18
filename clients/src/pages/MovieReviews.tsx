@@ -4,9 +4,9 @@ import { User, Send, Edit, Trash } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 interface Review {
-    rr_id: number; 
+    rr_id: number;
     rating: number;
-    review: string; 
+    review: string;
     user: { name: string };
 }
 
@@ -49,7 +49,7 @@ const MovieReviews: React.FC = () => {
         const token = localStorage.getItem('token');
         if (!token) {
             console.error('User is not logged in.');
-            toast.error('Login first.');
+            toast.error('You must be logged in to edit a review.');
             return;
         }
 
@@ -64,7 +64,7 @@ const MovieReviews: React.FC = () => {
         }
 
         const url = editMode
-            ? `http://localhost:3000/api/review/${reviewToEdit!.rr_id}` 
+            ? `http://localhost:3000/api/review/${reviewToEdit!.rr_id}`
             : 'http://localhost:3000/api/review/';
 
         const method = editMode ? 'PUT' : 'POST';
@@ -75,7 +75,7 @@ const MovieReviews: React.FC = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     rating,
-                    review: comment, 
+                    review: comment,
                     user_id: userId,
                     movie_id: id,
                 }),
@@ -142,6 +142,30 @@ const MovieReviews: React.FC = () => {
     const handleDelete = async (rr_id: number | undefined) => {
         if (!rr_id) {
             console.error('Invalid review ID for deletion');
+            toast.error('Invalid review ID.');
+            return;
+        }
+
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.error('User is not logged in.');
+            toast.error('You must be logged in to delete a review.');
+            return;
+        }
+
+        const decodedToken = JSON.parse(atob(token.split('.')[1]));
+        const userId = decodedToken.id;
+
+        const selectedReview = reviews.find((r) => r.rr_id === rr_id);
+        if (!selectedReview) {
+            console.error('Review not found for deletion');
+            toast.error('Review not found.');
+            return;
+        }
+
+        if (selectedReview.user.id !== userId) {
+            console.error('You are not the owner of this review.');
+            toast.error('You can only delete your own reviews.');
             return;
         }
 
@@ -153,7 +177,7 @@ const MovieReviews: React.FC = () => {
                 {
                     method: 'DELETE',
                     headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                        Authorization: `Bearer ${token}`,
                     },
                 }
             );
@@ -161,8 +185,10 @@ const MovieReviews: React.FC = () => {
             if (!response.ok) throw new Error('Failed to delete review');
 
             setReviews(reviews.filter((review) => review.rr_id !== rr_id));
+            toast.success('Review deleted successfully.');
         } catch (error) {
             console.error('Error deleting review:', error);
+            toast.error('Failed to delete review.');
         }
     };
 
