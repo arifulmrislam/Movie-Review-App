@@ -30,7 +30,7 @@ export default function SearchResults() {
                     setMovies([]); // Ensure it's always an array
 
                     // Redirect after 3 seconds if no movies are found
-                    setTimeout(() => navigate('/'), 3000);
+                    // setTimeout(() => navigate('/'), 5000);
                 }
             } catch (error) {
                 console.error('Error fetching movies:', error);
@@ -85,7 +85,7 @@ export default function SearchResults() {
                     <p className='text-red-500 text-center mt-4'>{error}</p>
                 ) : movies.length === 0 ? (
                     <p className='text-center mt-4 text-xl'>
-                        No movies found. Redirecting to home...
+                        No movies found.
                     </p>
                 ) : (
                     <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8'>
