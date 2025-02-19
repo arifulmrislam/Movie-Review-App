@@ -82,7 +82,6 @@ export const updateReviewById = async (req: Request, res: Response): Promise<voi
 }
 
 export const deleteReviewById = async (req: Request, res: Response): Promise<void> => {
-    //new line added
     try {
         const { id } = req.params;
 
@@ -118,30 +117,35 @@ export const deleteReviewById = async (req: Request, res: Response): Promise<voi
             return;
         }
 
+        const movieId = review.movie_id; // Store movie_id before deleting
+
         // Delete the review
         await review.destroy();
-
         console.log("Review deleted successfully");
-        res.status(200).json({ deleted: true });
+
+        // Recalculate average rating
+        const remainingReviews = await RR.findAll({
+            where: { movie_id: movieId },
+            attributes: ['rating']
+        });
+
+        const totalRatings = remainingReviews.reduce((sum: number, r: { rating: number }) => sum + r.rating, 0);
+        const averageRating = remainingReviews.length > 0 ? totalRatings / remainingReviews.length : 0;
+
+        // Update the movie's average rating
+        await db.Movie.update(
+            { average_rating: averageRating },
+            { where: { id: movieId } }
+        );
+
+        res.status(200).json({ deleted: true, averageRating });
     } catch (error) {
         console.error("Error deleting review:", error);
         res.status(500).json({ error: "Failed to delete review" });
     }
-//     try {
-//         const { id } = req.params;
-// 
-//         const rr = await RR.destroy({
-//             where: {
-//                 rr_id: Number(id)
-//             }
-//         });
-// 
-//         res.status(200).json({ deleted: true });
-//     } catch (error) {
-//         console.error("Error deleting review:", error);
-//         res.status(500).json({ error: "Failed to delete review" });
-//     }
-}
+};
+
+
 
 export const getReviewsByMovieId = async (req: Request, res: Response): Promise<void> => {
     try {

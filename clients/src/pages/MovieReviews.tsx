@@ -10,8 +10,15 @@ interface Review {
     user: { name: string };
 }
 
-const MovieReviews: React.FC = () => {
-    const { id } = useParams<{ id: string }>();
+interface MovieReviewsProps {
+    movieId: string;
+    onReviewAdded: () => void; // Function to trigger re-fetch
+}
+
+const MovieReviews: React.FC<MovieReviewsProps> = ({
+    movieId,
+    onReviewAdded,
+}) => {
     const [reviews, setReviews] = useState<Review[]>([]);
     const [rating, setRating] = useState(5);
     const [comment, setComment] = useState('');
@@ -21,23 +28,23 @@ const MovieReviews: React.FC = () => {
     useEffect(() => {
         const fetchReviews = async () => {
             try {
-                const response = await fetch(`http://localhost:3000/api/review?movie_id=${Number(id)}`);
+                const response = await fetch(
+                    `http://localhost:3000/api/review?movie_id=${Number(movieId)}`
+                );
                 if (!response.ok) throw new Error('Failed to fetch reviews');
                 const data = await response.json();
-                console.log("Fetched review data:", data);
 
-
-const formattedReviews = Array.isArray(data)
-    ? data.map((review) => ({
-        rr_id: review.rr_id,
-        rating: review.rating,
-        review: review.review,
-        user: {
-            name: review.user?.name || 'Unknown',
-            id: review.user_id || review.user?.id, // Ensure user ID is assigned
-        },
-    }))
-    : [];
+                const formattedReviews = Array.isArray(data)
+                    ? data.map((review) => ({
+                        rr_id: review.rr_id,
+                        rating: review.rating,
+                        review: review.review,
+                        user: {
+                            name: review.user?.name || 'Unknown',
+                            id: review.user_id || review.user?.id,
+                        },
+                    }))
+                    : [];
 
                 setReviews(formattedReviews);
             } catch (error) {
@@ -46,27 +53,19 @@ const formattedReviews = Array.isArray(data)
         };
 
         fetchReviews();
-    }, [id]);
+    }, [movieId]);
 
     const handleReviewSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         const token = localStorage.getItem('token');
         if (!token) {
-            console.error('User is not logged in.');
-            toast.error('You must be logged in to edit a review.');
+            toast.error('You must be logged in to post a review.');
             return;
         }
 
         const decodedToken = JSON.parse(atob(token.split('.')[1]));
         const userId = decodedToken.id;
-
-        if (editMode && (!reviewToEdit || !reviewToEdit.rr_id)) {
-            console.error(
-                'Editing mode is enabled but no valid review ID is available.'
-            );
-            return;
-        }
 
         const url = editMode
             ? `http://localhost:3000/api/review/${reviewToEdit!.rr_id}`
@@ -82,17 +81,17 @@ const formattedReviews = Array.isArray(data)
                     rating,
                     review: comment,
                     user_id: userId,
-                    movie_id: id,
+                    movie_id: movieId,
                 }),
             });
 
             if (!response.ok) throw new Error('Failed to submit review');
 
-            // Fetch the updated list of reviews after submission
+            // Re-fetch updated reviews
             const fetchReviews = async () => {
                 try {
                     const response = await fetch(
-                        `http://localhost:3000/api/review?movie_id=${Number(id)}`
+                        `http://localhost:3000/api/review?movie_id=${Number(movieId)}`
                     );
                     if (!response.ok) throw new Error('Failed to fetch reviews');
                     const data = await response.json();
@@ -104,6 +103,9 @@ const formattedReviews = Array.isArray(data)
 
             fetchReviews();
 
+            // Trigger movie details update to reflect new average rating
+            onReviewAdded();
+
             setComment('');
             setRating(5);
             setEditMode(false);
@@ -112,7 +114,6 @@ const formattedReviews = Array.isArray(data)
             console.error('Error submitting review:', error);
         }
     };
-
 
     const renderStars = (rating: number) =>
         Array.from({ length: 5 }, (_, index) => (
@@ -187,13 +188,6 @@ const formattedReviews = Array.isArray(data)
             return;
         }
 
-        // Ensure user_id exists in selectedReview
-        // if (!selectedReview.user || selectedReview.user.id !== userId) {
-        //     console.error('You are not the owner of this review.');
-        //     toast.error('You can only delete your own reviews.');
-        //     return;
-        // }
-
         try {
             console.log('Attempting to delete review with ID:', rr_id);
 
@@ -209,18 +203,20 @@ const formattedReviews = Array.isArray(data)
 
             if (!response.ok) throw new Error('Failed to delete review');
 
-            // setReviews(reviews.filter((review) => review.rr_id !== rr_id));
+            // Remove the review from the list
             setReviews((prevReviews) =>
-                    prevReviews.filter((review) => review.rr_id !== rr_id)
+                prevReviews.filter((review) => review.rr_id !== rr_id)
             );
 
             toast.success('Review deleted successfully.');
+
+            // Re-fetch movie details to update the average rating
+            onReviewAdded(); // This will trigger a re-fetch of the movie details
         } catch (error) {
             console.error('Error deleting review:', error);
             toast.error('Failed to delete review.');
         }
     };
-
 
 
     return (

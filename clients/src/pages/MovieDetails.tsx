@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Calendar, Building2, Star } from 'lucide-react';
+import MovieReviews from './MovieReviews';
 
 interface Movie {
     id: string;
@@ -16,30 +17,30 @@ const MovieDetails: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [movie, setMovie] = useState<Movie | null>(null);
 
-    useEffect(() => {
-        const fetchMovie = async () => {
-            try {
-                const response = await fetch(`http://localhost:3000/api/movie/${id}`);
-                if (response.ok) {
-                    const data = await response.json();
-                    const formattedMovie: Movie = {
-                        id: data.movie_id.toString(),
-                        title: data.title,
-                        imageUrl: data.img,
-                        description: data.desc,
-                        releaseDate: data.release_yr.toString(),
-                        publisher: data.producer,
-                        averageRating: data.rating ?? 0,
-                    };
-                    setMovie(formattedMovie);
-                } else {
-                    console.error('Failed to fetch movie');
-                }
-            } catch (error) {
-                console.error('Error fetching movie:', error);
+    const fetchMovie = async () => {
+        try {
+            const response = await fetch(`http://localhost:3000/api/movie/${id}`);
+            if (response.ok) {
+                const data = await response.json();
+                const formattedMovie: Movie = {
+                    id: data.movie_id.toString(),
+                    title: data.title,
+                    imageUrl: data.img,
+                    description: data.desc,
+                    releaseDate: data.release_yr.toString(),
+                    publisher: data.producer,
+                    averageRating: data.rating ?? 0,
+                };
+                setMovie(formattedMovie);
+            } else {
+                console.error('Failed to fetch movie');
             }
-        };
+        } catch (error) {
+            console.error('Error fetching movie:', error);
+        }
+    };
 
+    useEffect(() => {
         fetchMovie();
     }, [id]);
 
@@ -75,6 +76,9 @@ const MovieDetails: React.FC = () => {
                     <p className='text-gray-700 leading-relaxed'>{movie.description}</p>
                 </div>
             </div>
+
+            {/* Pass fetchMovie as a prop to re-fetch when a review is added */}
+            <MovieReviews movieId={id} onReviewAdded={fetchMovie} />
         </div>
     );
 };
