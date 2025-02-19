@@ -50,7 +50,7 @@ export const createReview = async (req: Request, res: Response): Promise<void> =
 
 
 
-export const updateReviewById = async (req: Request, res: Response) => {
+export const updateReviewById = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
         const updatedData = req.body;
@@ -59,6 +59,13 @@ export const updateReviewById = async (req: Request, res: Response) => {
 
         if (!rr) {
             res.status(404).json({ error: "Review not found" });
+            return;
+        }
+
+        //Ensure the user is the owner of the review 
+        // new line added
+        if (rr.user_id !== updatedData.user_id) {
+            res.status(403).json({ error: "Unauthorized" });
             return;
         }
 
@@ -74,21 +81,66 @@ export const updateReviewById = async (req: Request, res: Response) => {
     }
 }
 
-export const deleteReviewById = async (req: Request, res: Response) => {
+export const deleteReviewById = async (req: Request, res: Response): Promise<void> => {
+    //new line added
     try {
         const { id } = req.params;
 
-        const rr = await RR.destroy({
-            where: {
-                rr_id: Number(id)
-            }
-        });
+        // Extract and decode the token
+        const token = req.headers.authorization?.split(' ')[1];
+        if (!token) {
+            console.error("No token provided");
+            res.status(401).json({ error: "Unauthorized" });
+            return;
+        }
 
+        console.log("Token:", token);
+
+        const decodedToken = JSON.parse(atob(token.split('.')[1]));
+        const userId = decodedToken.id;
+
+        console.log("User ID from token:", userId);
+
+        // Find the review by ID
+        const review = await RR.findByPk(id);
+        if (!review) {
+            console.error("Review not found");
+            res.status(404).json({ error: "Review not found" });
+            return;
+        }
+
+        console.log("Review found:", review);
+
+        // Ensure the user is the owner of the review
+        if (review.user_id !== userId) {
+            console.error("User is not the owner of the review");
+            res.status(403).json({ error: "You can only delete your own reviews" });
+            return;
+        }
+
+        // Delete the review
+        await review.destroy();
+
+        console.log("Review deleted successfully");
         res.status(200).json({ deleted: true });
     } catch (error) {
         console.error("Error deleting review:", error);
         res.status(500).json({ error: "Failed to delete review" });
     }
+//     try {
+//         const { id } = req.params;
+// 
+//         const rr = await RR.destroy({
+//             where: {
+//                 rr_id: Number(id)
+//             }
+//         });
+// 
+//         res.status(200).json({ deleted: true });
+//     } catch (error) {
+//         console.error("Error deleting review:", error);
+//         res.status(500).json({ error: "Failed to delete review" });
+//     }
 }
 
 export const getReviewsByMovieId = async (req: Request, res: Response): Promise<void> => {

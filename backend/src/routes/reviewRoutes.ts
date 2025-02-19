@@ -2,6 +2,7 @@ import express from 'express';
 import { Request, Response } from 'express';
 import { createReview, deleteReviewById, updateReviewById, getReviewsByMovieId } from '../controllers/reviewController';
 import RR from '../models/review';
+import authenticateToken from '../middlewares/authMiddleware';
 
 const router = express.Router();
 
