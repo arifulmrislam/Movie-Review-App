@@ -54,18 +54,21 @@ const Navbar: React.FC = () => {
 
                         {user ? (
                             <>
+                                <span className='flex items-center space-x-1 hover:text-gray-200 transition-colors'>
+                                    Hi, {user.name.split(' ')[0].toLowerCase()}
+                                </span>
                                 <Link
                                     to='/add-movie'
                                     className='flex items-center space-x-1 hover:text-gray-200 transition-colors'
                                 >
-                                    <PlusCircle size={18} />
+                                    {/* <PlusCircle size={18} /> */}
                                     <span>Add Movie</span>
                                 </Link>
                                 <button
                                     onClick={logout}
                                     className='flex items-center space-x-1 hover:text-gray-200 transition-colors'
                                 >
-                                    <LogOut size={18} />
+                                    {/* <LogOut size={18} /> */}
                                     <span>Logout</span>
                                 </button>
                             </>
@@ -114,14 +117,14 @@ const Navbar: React.FC = () => {
                                     to='/add-movie'
                                     className='block py-2 hover:bg-white/10 rounded-lg transition-all'
                                 >
-                                    <PlusCircle size={18} className='inline mr-2' />
+                                    {/* <PlusCircle size={18} className='inline mr-2' /> */}
                                     Add Movie
                                 </Link>
                                 <button
                                     onClick={logout}
                                     className='block w-full text-left py-2 hover:bg-white/10 rounded-lg transition-all'
                                 >
-                                    <LogOut size={18} className='inline mr-2' />
+                                    {/* <LogOut size={18} className='inline mr-2' /> */}
                                     Logout
                                 </button>
                             </>
