@@ -25,50 +25,54 @@ const Navbar: React.FC = () => {
 
     return (
         <div className='bg-gradient-to-r from-[#FA320A] to-[#FF6B4A] text-white shadow-lg'>
-            <nav className='container mx-auto'>
-                <div className='flex items-center justify-between px-4 py-3'>
+            <nav className='container mx-auto px-4 py-3'>
+                <div className='flex items-center justify-between'>
+                    {/* Logo */}
                     <Link to='/' className='flex items-center space-x-2'>
                         <img
                             className='h-12 w-auto'
-                            src={logo || '/placeholder.svg'}
+                            // src={logo || '/placeholder.svg'}
+                            src='https://res.cloudinary.com/di835w1z1/image/upload/v1726561472/logo_gdap68.png'
                             alt='Logo'
                         />
-                        {/* <span className='text-2xl font-bold hidden sm:inline'>
-              MovieCritic
-            </span> */}
                     </Link>
 
-                    <div className='hidden md:flex items-center space-x-4'>
-                        <form onSubmit={handleSearch} className='relative'>
+                    {/* Centered Search Bar */}
+                    <div className='flex-1 flex justify-center'>
+                        <form
+                            onSubmit={handleSearch}
+                            className='relative w-full max-w-lg'
+                        >
                             <input
                                 type='search'
                                 placeholder='Search movies...'
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className='w-64 px-4 py-2 pl-10 bg-white/10 rounded-full placeholder-white/70 text-white transition-all focus:outline-none focus:bg-white/20 focus:ring-2 focus:ring-white/20'
+                                className='w-full px-4 py-2 pl-10 bg-white/10 rounded-full placeholder-white/70 text-white transition-all focus:outline-none focus:bg-white/20 focus:ring-2 focus:ring-white/20'
                             />
                             <button type='submit' className='absolute left-3 top-2.5'>
                                 <Search className='h-5 w-5 text-white/70' />
                             </button>
                         </form>
+                    </div>
 
+                    {/* User Links */}
+                    <div className='hidden md:flex items-center space-x-8'>
                         {user ? (
                             <>
-                                <span className='flex items-center space-x-1 hover:text-gray-200 transition-colors'>
+                                <span className='hover:text-gray-200 transition-colors'>
                                     Hi, {user.name.split(' ')[0].toLowerCase()}
                                 </span>
                                 <Link
                                     to='/add-movie'
-                                    className='flex items-center space-x-1 hover:text-gray-200 transition-colors'
+                                    className='hover:text-gray-200 transition-colors'
                                 >
-                                    {/* <PlusCircle size={18} /> */}
                                     <span>Add Movie</span>
                                 </Link>
                                 <button
                                     onClick={logout}
-                                    className='flex items-center space-x-1 hover:text-gray-200 transition-colors'
+                                    className='hover:text-gray-200 transition-colors'
                                 >
-                                    {/* <LogOut size={18} /> */}
                                     <span>Logout</span>
                                 </button>
                             </>
@@ -90,6 +94,7 @@ const Navbar: React.FC = () => {
                         )}
                     </div>
 
+                    {/* Mobile Menu Button */}
                     <button className='md:hidden' onClick={toggleMenu}>
                         {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
                     </button>
@@ -117,14 +122,12 @@ const Navbar: React.FC = () => {
                                     to='/add-movie'
                                     className='block py-2 hover:bg-white/10 rounded-lg transition-all'
                                 >
-                                    {/* <PlusCircle size={18} className='inline mr-2' /> */}
                                     Add Movie
                                 </Link>
                                 <button
                                     onClick={logout}
                                     className='block w-full text-left py-2 hover:bg-white/10 rounded-lg transition-all'
                                 >
-                                    {/* <LogOut size={18} className='inline mr-2' /> */}
                                     Logout
                                 </button>
                             </>
@@ -154,8 +157,3 @@ const Navbar: React.FC = () => {
 };
 
 export default Navbar;
-
-
-
-
-

@@ -2,88 +2,100 @@
 
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+
+const getRandomMovies = (movies, count = 20) => {
+    const shuffled = [...movies].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, count);
+};
 
 export default function Hero({ movies }) {
-    const [currentSlide, setCurrentSlide] = useState(0);
+    const [randomMovies, setRandomMovies] = useState([]);
+    const [visibleIndex, setVisibleIndex] = useState(0);
 
-    const nextSlide = () => {
-        setCurrentSlide((prev) => (prev + 1) % movies.length);
-    };
-
-    const prevSlide = () => {
-        setCurrentSlide((prev) => (prev - 1 + movies.length) % movies.length);
-    };
-
+    // Load 20 random movies initially
     useEffect(() => {
-        const interval = setInterval(nextSlide, 5000);
-        return () => clearInterval(interval);
-    }, [movies.length]);
+        if (movies.length > 0) {
+            setRandomMovies(getRandomMovies(movies));
+        }
+    }, [movies]);
 
-    if (!movies || movies.length === 0) {
+    // Auto-slide every 5 seconds (move one movie at a time)
+    useEffect(() => {
+        const autoSlide = setInterval(() => {
+            setVisibleIndex((prevIndex) => (prevIndex + 1) % randomMovies.length);
+        }, 5000);
+
+        return () => clearInterval(autoSlide);
+    }, [randomMovies]);
+
+    // Manual controls for left and right navigation
+    const scrollLeft = () => {
+        setVisibleIndex((prevIndex) =>
+            prevIndex === 0 ? randomMovies.length - 1 : prevIndex - 1
+        );
+    };
+
+    const scrollRight = () => {
+        setVisibleIndex((prevIndex) => (prevIndex + 1) % randomMovies.length);
+    };
+
+    if (!randomMovies || randomMovies.length === 0) {
         return (
-            <div className='relative h-[600px] flex items-center justify-center bg-gray-900 text-white'>
+            <div className='relative h-[400px] flex items-center justify-center bg-gray-900 text-white'>
                 <p className='text-2xl'>No movies available</p>
             </div>
         );
     }
 
+    // Get the current 5-movie slice
+    const visibleMovies = [
+        ...randomMovies.slice(visibleIndex, visibleIndex + 5),
+        ...randomMovies.slice(
+            0,
+            Math.max(0, visibleIndex + 5 - randomMovies.length)
+        ),
+    ];
+
     return (
-        <div className='relative h-[400px] overflow-hidden bg-gray-900'>
-            <div
-                className='absolute inset-0 transition-transform duration-500 ease-in-out'
-                style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-            >
-                <div className='flex h-full'>
-                    {movies.map((movie) => (
-                        <div
-                            key={movie.id}
-                            className='relative w-full h-full flex-shrink-0'
-                        >
-                            <img
-                                src={movie.imageUrl || '/placeholder.svg'}
-                                alt={movie.title}
-                                className='absolute inset-0 w-full h-full object-cover'
-                            />
-                            <div className='absolute inset-0 bg-gradient-to-t from-black/80 to-transparent' />
-                            <div className='absolute bottom-0 left-0 p-8 text-white'>
-                                <h2 className='text-3xl font-bold mb-2'>{movie.title}</h2>
-                                <p className='text-lg mb-4'>{movie.description}</p>
-                                <Link
-                                    to={movie.link}
-                                    className='inline-block bg-white/20 hover:bg-white/30 px-6 py-2 rounded-md transition-colors'
-                                >
-                                    Learn More
-                                </Link>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
+        <div className='relative w-full overflow-hidden'>
+            {/* Left Scroll Button */}
             <button
-                onClick={prevSlide}
-                className={`absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 p-2 rounded-full text-white transition-colors ${currentSlide === 0 ? 'bg-red-500' : ''
-                    }`}
+                onClick={scrollLeft}
+                className='absolute left-4 top-1/2 -translate-y-1/2 bg-red-500/50 hover:bg-red-500 hover:scale-110 p-2 rounded-full text-white z-10 transition-all duration-300'
             >
                 <ChevronLeft className='h-6 w-6' />
             </button>
+
+            {/* Movies List (Auto Slide One-by-One) */}
+            <div className='flex space-x-4 overflow-hidden scroll-smooth p-4 transition-transform duration-500 ease-in-out'>
+                {visibleMovies.map((movie, index) => (
+                    <div
+                        key={index}
+                        className='relative min-w-[250px] md:min-w-[300px] lg:min-w-[350px] rounded-lg overflow-hidden shadow-lg transform transition-transform duration-300 hover:scale-105'
+                    >
+                        {/* Movie Image with Hover Zoom Effect */}
+                        <div className='relative overflow-hidden'>
+                            <img
+                                src={movie.imageUrl || '/placeholder.svg'}
+                                alt={movie.title}
+                                className='w-full h-[300px] object-cover transform transition-transform duration-300 hover:scale-110'
+                            />
+                        </div>
+                        <div className='absolute inset-0 bg-gradient-to-t from-black/80 to-transparent' />
+                        <div className='absolute bottom-4 left-4 text-white'>
+                            <h2 className='text-2xl font-bold'>{movie.title}</h2>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {/* Right Scroll Button */}
             <button
-                onClick={nextSlide}
-                className={`absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 p-2 rounded-full text-white transition-colors ${currentSlide === movies.length - 1 ? 'bg-red-500' : ''
-                    }`}
+                onClick={scrollRight}
+                className='absolute right-4 top-1/2 -translate-y-1/2 bg-red-500/50 hover:bg-red-500 hover:scale-110 p-2 rounded-full text-white z-10 transition-all duration-300'
             >
                 <ChevronRight className='h-6 w-6' />
             </button>
-            <div className='absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2'>
-                {movies.map((_, index) => (
-                    <button
-                        key={index}
-                        onClick={() => setCurrentSlide(index)}
-                        className={`w-2 h-2 rounded-full transition-colors ${index === currentSlide ? 'bg-red-500' : 'bg-white/50'
-                            }`}
-                    />
-                ))}
-            </div>
         </div>
     );
 }
