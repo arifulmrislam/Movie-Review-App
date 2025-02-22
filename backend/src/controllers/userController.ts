@@ -38,3 +38,27 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         res.status(500).json({ error: "Failed to authenticate user" });
     }
 };
+
+export const getUserProfile = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const userId = (req as any).user?.id; 
+        if (!userId) {
+            res.status(401).json({ error: "Unauthorized" });
+            return
+        }
+
+        const user = await User.findByPk(userId, {
+            attributes: { exclude: ["password"] }, 
+        });
+
+        if (!user) {
+            res.status(404).json({ error: "User not found" });
+            return;
+        }
+
+        res.json({ user });
+    } catch (error) {
+        console.error("Error fetching user profile:", error);
+        res.status(500).json({ error: "Server error" });
+    }
+};

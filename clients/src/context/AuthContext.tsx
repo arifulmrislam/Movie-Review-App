@@ -85,16 +85,17 @@ export const useAuth = (): AuthContextType => {
 };
 
 export const AuthProvider: React.FC = ({ children }) => {
+    const storedToken = localStorage.getItem('token');
     const [user, setUser] = useState<any>(null);
     const [token, setToken] = useState<string | null>(null);
 
     useEffect(() => {
-        const storedToken = localStorage.getItem('token');
+        // const storedToken = localStorage.getItem('token');
         if (storedToken) {
-            setToken(storedToken);
+            // setToken(storedToken);
             fetchUser(storedToken);
         }
-    }, []);
+    }, [storedToken]);
 
     const fetchUser = async (token: string) => {
         try {
