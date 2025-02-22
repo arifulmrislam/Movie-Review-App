@@ -49,7 +49,7 @@ const AddMovie: React.FC = () => {
             return;
         }
 
-        let uploadedImageUrl = imageUrl; 
+        let uploadedImageUrl = imageUrl;
 
         if (imageFile) {
             uploadedImageUrl = await handleImageUpload(imageFile);
