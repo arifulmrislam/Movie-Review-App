@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { Clock, Calendar } from 'lucide-react';
 
@@ -19,7 +19,6 @@ interface Movie {
 export default function SearchResults() {
     const [searchParams] = useSearchParams();
     const query = searchParams.get('query') || '';
-    const navigate = useNavigate();
     const [movies, setMovies] = useState<Movie[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -40,7 +39,7 @@ export default function SearchResults() {
                         releaseYear: movie.release_yr.toString(),
                         length: movie.length ? movie.length.toString() : 'N/A',
                         description: movie.desc,
-                        averageRating: movie.rating ?? 0.0, // Default to 0 if no rating
+                        averageRating: movie.rating ?? 0.0, 
                     }));
                     setMovies(formattedMovies);
                 } else {
