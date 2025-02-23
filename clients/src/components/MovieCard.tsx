@@ -1,6 +1,6 @@
 import type React from 'react';
 import { Link } from 'react-router-dom';
-import { Edit, Star, Film } from 'lucide-react'; // Import relevant icons
+import { Star, Clapperboard } from 'lucide-react';
 
 interface MovieCardProps {
     id: string;
@@ -24,14 +24,11 @@ const MovieCard: React.FC<MovieCardProps> = ({
             <div className='group relative'>
                 <div className='relative aspect-[2/3] overflow-hidden rounded-lg'>
                     <div className='absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors z-10' />
-                    {/* Custom button to view details */}
                     <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20'>
                         <button
                             onClick={() => (window.location.href = `/movies/${id}`)}
                             className='flex items-center justify-center w-24 h-24 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity'
-                        >
-                            <Edit className='w-12 h-12' />
-                        </button>
+                        ></button>
                     </div>
                     <img
                         src={imageUrl || '/placeholder.svg'}
@@ -48,7 +45,7 @@ const MovieCard: React.FC<MovieCardProps> = ({
                         </div>
                     </div>
                     <h3 className='font-medium text-m mt-1 line-clamp-2'>
-                        <Film className='inline-block w-4 h-4 mr-1 text-gray-500' />
+                        <Clapperboard className='inline-block w-5 h-5 mr-2 text-blue-400 align-middle' />
                         {title} ({release_yr})
                     </h3>
                 </div>

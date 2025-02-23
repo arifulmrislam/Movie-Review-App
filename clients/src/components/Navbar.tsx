@@ -24,8 +24,8 @@ const Navbar: React.FC = () => {
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
     return (
-        <div className='bg-gradient-to-r from-[#FA320A] to-[#FF6B4A] text-white shadow-lg'>
-            <nav className='container mx-auto px-4 py-3'>
+        <div className='bg-[#FA320A] text-white shadow-lg'>
+            <nav className='container mx-auto px-10 py-3'>
                 <div className='flex items-center justify-between'>
                     {/* Logo */}
                     <Link to='/' className='flex items-center space-x-2'>
@@ -53,14 +53,14 @@ const Navbar: React.FC = () => {
                     </div>
 
                     {/* User Links */}
-                    <div className='hidden md:flex items-center space-x-8'>
+                    <div className='hidden md:flex items-center space-x-10 font-semibold'>
                         {user ? (
                             <>
                                 <Link
                                     to='/user-movies'
                                     className='hover:text-gray-200 transition-colors'
                                 >
-                                    Hi, {user.name.split(' ')[0].toLowerCase()}
+                                    Hi, {user.name.split(' ')[0].charAt(0).toUpperCase() + user.name.split(' ')[0].slice(1).toLowerCase()}
                                 </Link>
                                 <Link
                                     to='/add-movie'
@@ -70,7 +70,7 @@ const Navbar: React.FC = () => {
                                 </Link>
                                 <button
                                     onClick={logout}
-                                    className='hover:text-gray-200 transition-colors'
+                                    className='hover:text-gray-200 transition-colors cursor-pointer'
                                 >
                                     <span>Logout</span>
                                 </button>
@@ -102,18 +102,30 @@ const Navbar: React.FC = () => {
                 {/* Mobile menu */}
                 {isMenuOpen && (
                     <div className='md:hidden px-4 py-2 space-y-3'>
-                        <form onSubmit={handleSearch} className='relative'>
+                        import {Search, X} from 'lucide-react';
+
+                        <form onSubmit={handleSearch} className='relative w-full max-w-md mx-auto'>
                             <input
                                 type='search'
                                 placeholder='Search movies...'
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className='w-full px-4 py-2 pl-10 bg-white/10 rounded-full placeholder-white/70 text-white transition-all focus:outline-none focus:bg-white/20 focus:ring-2 focus:ring-white/20'
+                                className='w-full px-4 py-2 pl-12 pr-10 bg-white/10 rounded-full placeholder-white/70 text-white transition-all focus:outline-none focus:bg-white/20 focus:ring-2 focus:ring-white/30'
                             />
-                            <button type='submit' className='absolute left-3 top-2.5'>
-                                <Search className='h-5 w-5 text-white/70' />
+
+                            {/* Search Icon */}
+                            <button type='submit' className='absolute left-4 top-2.5 text-white/70 hover:text-white'>
+                                <Search className='h-5 w-5' />
                             </button>
+
+                            {/* Clear Input Button (Only visible when there's text) */}
+                            {searchQuery && (
+                                <button type='button' onClick={() => setSearchQuery('')} className='absolute right-4 top-2.5 text-white/70 hover:text-white'>
+                                    <X className='h-5 w-5' />
+                                </button>
+                            )}
                         </form>
+
 
                         {user ? (
                             <>

@@ -19,7 +19,7 @@ function App() {
                 <div className='min-h-screen bg-gray-100'>
                     <Navbar />
                     <ToastContainer />
-                    <main className='container mx-auto px-4 py-8'>
+                    <main className='container mx-auto px-4 py-8 bg-[#ffffff]'>
                         <Routes>
                             <Route path='/' element={<Home />} />
                             <Route path='/movies/:id' element={<MoviePage />} />

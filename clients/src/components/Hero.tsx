@@ -83,7 +83,9 @@ export default function Hero({ movies }) {
                         </div>
                         <div className='absolute inset-0 bg-gradient-to-t from-black/80 to-transparent' />
                         <div className='absolute bottom-4 left-4 text-white'>
-                            <h2 className='text-2xl font-bold'>{movie.title}</h2>
+                            <h2 className='text-2xl font-bold text-white uppercase tracking-wide drop-shadow-lg bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500 bg-clip-text text-transparent'>
+                                {movie.title}
+                            </h2>
                         </div>
                     </div>
                 ))}
