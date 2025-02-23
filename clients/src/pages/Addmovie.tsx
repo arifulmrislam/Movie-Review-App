@@ -12,6 +12,7 @@ const AddMovie: React.FC = () => {
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
     const [genre, setGenre] = useState<string[]>([]);
+    const [length, setLength] = useState('');
 
     const { user, token } = useAuth();
     const navigate = useNavigate();
@@ -65,7 +66,7 @@ const AddMovie: React.FC = () => {
             img: uploadedImageUrl, // Use uploaded image URL
             desc: description,
             release_yr: new Date(releaseDate).getFullYear(),
-            length: '120',
+            length,
             producer: publisher,
             genre,
         };
@@ -93,37 +94,16 @@ const AddMovie: React.FC = () => {
     return (
         <div className='min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 py-12 px-4 sm:px-6 lg:px-8'>
             <div className='max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-sm'>
-                <h1 className='text-3xl font-bold mb-8 text-gray-900'>Add New Movie</h1>
+                <h1 className='text-3xl font-bold mb-8 text-gray-900'>
+                    Create Movie
+                </h1>
                 <form onSubmit={handleSubmit} className='space-y-6'>
-                    <div>
-                        <label
-                            htmlFor='genre'
-                            className='block text-sm font-medium text-gray-700 mb-2'
-                        >
-                            Genre
-                        </label>
-                        <select
-                            id='genre'
-                            value={genre}
-                            onChange={(e) =>
-                                setGenre(
-                                    Array.from(e.target.selectedOptions, (option) => option.value)
-                                )
-                            }
-                            multiple
-                            className='block w-full pl-3 pr-3 py-2.5 border border-gray-300 rounded-lg'
-                        >
-                            <option value='Action'>Action</option>
-                            <option value='Comedy'>Comedy</option>
-                            <option value='Drama'>Drama</option>
-                        </select>
-                    </div>
                     <div>
                         <label
                             htmlFor='title'
                             className='block text-sm font-medium text-gray-700 mb-2'
                         >
-                            Title
+                            Movie Name
                         </label>
                         <input
                             type='text'
@@ -152,6 +132,22 @@ const AddMovie: React.FC = () => {
                     </div>
                     <div>
                         <label
+                            htmlFor='length'
+                            className='block text-sm font-medium text-gray-700 mb-2'
+                        >
+                            Movie Length (minutes)
+                        </label>
+                        <input
+                            type='number'
+                            id='length'
+                            value={length}
+                            onChange={(e) => setLength(e.target.value)}
+                            required
+                            className='block w-full px-3 py-2.5 border border-gray-300 rounded-lg'
+                        />
+                    </div>
+                    <div>
+                        <label
                             htmlFor='releaseDate'
                             className='block text-sm font-medium text-gray-700 mb-2'
                         >
@@ -166,6 +162,38 @@ const AddMovie: React.FC = () => {
                             className='block w-full px-3 py-2.5 border border-gray-300 rounded-lg'
                         />
                     </div>
+                                        <div>
+    <label className='block text-sm font-medium text-gray-700 mb-2'>
+        Genres (Select 1-3)
+    </label>
+    <div className='grid grid-cols-2 gap-2'>
+        {['Action', 'Adventure', 'Thriller', 'Crime', 'Comedy', 'Drama', 'Sci-Fi', 'Sport', 'Animation', 'Horror'].map((g) => (
+            <label key={g} className='flex items-center space-x-2 cursor-pointer'>
+                <input
+                    type='checkbox'
+                    value={g}
+                    checked={genre.includes(g)}
+                    onChange={(e) => {
+                        const selected = e.target.value;
+                        setGenre((prev) =>
+                            prev.includes(selected)
+                                ? prev.filter((item) => item !== selected) // Remove if unchecked
+                                : prev.length < 3
+                                ? [...prev, selected] // Add if under 3
+                                : prev // Ignore if 3 are selected
+                        );
+                    }}
+                    className='h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded'
+                />
+                <span className='text-gray-700'>{g}</span>
+            </label>
+        ))}
+    </div>
+    {genre.length === 3 && (
+        <p className='text-xs text-red-500 mt-1'>You can only select up to 3 genres.</p>
+    )}
+</div>
+
                     <div>
                         <label
                             htmlFor='publisher'
@@ -187,7 +215,7 @@ const AddMovie: React.FC = () => {
                             htmlFor='imageFile'
                             className='block text-sm font-medium text-gray-700 mb-2'
                         >
-                            Upload Movie Image
+                            Thumbnail
                         </label>
                         <input
                             type='file'
@@ -215,7 +243,7 @@ const AddMovie: React.FC = () => {
                         type='submit'
                         className='w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors duration-200 font-medium'
                     >
-                        Add Movie
+                        Create Movie
                     </button>
                 </form>
             </div>

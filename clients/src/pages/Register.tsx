@@ -19,15 +19,24 @@ const Register: React.FC = () => {
             toast.error("Passwords don't match");
             return;
         }
+
+        if (password.length < 8) {
+            toast.error('Password must be at least 8 characters long');
+            return;
+        }
         try {
             await register(username, email, password);
-            navigate('/');
+            // navigate('/');
         } catch (error) {
             console.error('Registration failed:', error);
             toast.error('Registration failed. Please try again.');
+            return;
         }
     };
 
+    const handleLogInClick = () => {
+        navigate('/login');
+    }
     return (
         <div className='min-h-auto w-full bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-4'>
             <div className='w-full max-w-md bg-white rounded-lg shadow-lg p-8 transform transition-all'>
@@ -136,12 +145,12 @@ const Register: React.FC = () => {
                 </form>
                 <p className='mt-6 text-center text-sm text-gray-600'>
                     Already have an account?{' '}
-                    <a
-                        href='#'
-                        className='text-blue-600 hover:text-blue-700 font-medium'
+                    <button
+                        onClick={handleLogInClick}
+                        className='text-blue-600 hover:text-blue-700 font-medium cursor-pointer'
                     >
                         Sign in
-                    </a>
+                    </button>
                 </p>
             </div>
         </div>

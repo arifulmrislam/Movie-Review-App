@@ -3,19 +3,29 @@ import User from "../models/user";
 
 export const signUpWithLogin = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { email } = req.body;
+        const { name, email } = req.body;
+
+        const existingUsername = await User.findOne({ where: { name } });
+        if (existingUsername) {
+            res.status(400).json({ error: "User is already in use" });
+            return;
+        }
+
         const existingUser = await User.findOne({ where: { email } });
         if (existingUser) {
             res.status(400).json({ error: "Email is already in use" });
             return;
         }
+
         const user = await User.create(req.body);
         const token = user.generateToken();
+
         res.status(201).json({ user: user.toJSON(), token });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Failed to create user" });
+    } catch (error: any) {
+        console.error("Signup Error:", error.message || error);
+        res.status(500).json({ error: error.message || "Failed to create user" });
     }
+
 };
 
 export const login = async (req: Request, res: Response): Promise<void> => {

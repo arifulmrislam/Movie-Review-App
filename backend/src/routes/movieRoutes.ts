@@ -6,7 +6,7 @@ import {
     editMovie,
     getAllMovies,
     getMovieById,
-    getMovieByUserId
+    getMovieByUserId,
 } from '../controllers/movieController';
 
 const router = Router();

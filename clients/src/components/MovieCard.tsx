@@ -35,10 +35,10 @@ const MovieCard: React.FC<MovieCardProps> = ({
                             {Math.round(averageRating * 10)}%
                         </div>
                     </div>
-                    <h3 className='font-medium text-sm mt-1 line-clamp-2'>{title}</h3>
-                    <button className='mt-2 text-xs border border-gray-300 rounded px-3 py-1 hover:bg-gray-100 transition-colors'>
+                    <h3 className='font-medium text-m mt-1 line-clamp-2'>{title}</h3>
+                    {/* <button className='mt-2 text-xs border border-gray-300 rounded px-3 py-1 hover:bg-gray-100 transition-colors'>
                         WATCHLIST
-                    </button>
+                    </button> */}
                 </div>
             </div>
         </Link>

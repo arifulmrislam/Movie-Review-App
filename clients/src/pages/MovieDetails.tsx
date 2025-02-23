@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Calendar, Building2, Star } from 'lucide-react';
+import { Calendar, Building2, Star, Clock } from 'lucide-react';
 import MovieReviews from './MovieReviews';
 
 interface Movie {
@@ -11,6 +11,7 @@ interface Movie {
     releaseDate: string;
     publisher: string;
     averageRating: number;
+    length: number;
 }
 
 const MovieDetails: React.FC = () => {
@@ -30,6 +31,7 @@ const MovieDetails: React.FC = () => {
                     releaseDate: data.release_yr.toString(),
                     publisher: data.producer,
                     averageRating: data.rating ?? 0,
+                    length: data.length, // Store movie length
                 };
                 setMovie(formattedMovie);
             } else {
@@ -68,6 +70,10 @@ const MovieDetails: React.FC = () => {
                             <strong>Publisher:</strong> {movie.publisher}
                         </p>
                         <p className='flex items-center gap-2 text-gray-600'>
+                            <Clock className='w-5 h-5' />
+                            <strong>Length:</strong> {movie.length} minutes
+                        </p>
+                        <p className='flex items-center gap-2 text-gray-600'>
                             <Star className='w-5 h-5 text-yellow-400' />
                             <strong>Average Rating:</strong>{' '}
                             <span className='text-lg'>{movie.averageRating.toFixed(1)}</span>
@@ -77,7 +83,7 @@ const MovieDetails: React.FC = () => {
                 </div>
             </div>
 
-            {/* Pass fetchMovie as a prop to re-fetch when a review is added */}
+
             <MovieReviews movieId={id} onReviewAdded={fetchMovie} />
         </div>
     );

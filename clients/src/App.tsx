@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Home from './pages/Home';
 import MoviePage from './pages/MoviePage';
@@ -6,7 +6,7 @@ import AddMovie from './pages/AddMovie';
 import EditMovie from './pages/EditMovie';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import SearchResults from './pages/SearchResults'; 
+import SearchResults from './pages/SearchResults';
 import Navbar from './components/Navbar';
 import UserMovies from './pages/UserMovies';
 import { ToastContainer } from 'react-toastify';
@@ -14,8 +14,8 @@ import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
     return (
-        <AuthProvider>
-            <Router>
+        <BrowserRouter>
+            <AuthProvider>
                 <div className='min-h-screen bg-gray-100'>
                     <Navbar />
                     <ToastContainer />
@@ -24,7 +24,7 @@ function App() {
                             <Route path='/' element={<Home />} />
                             <Route path='/movies/:id' element={<MoviePage />} />
                             <Route path='/add-movie' element={<AddMovie />} />
-                            <Route path="/user-movies" element={<UserMovies />} />
+                            <Route path='/user-movies' element={<UserMovies />} />
                             <Route path='/edit-movie/:id' element={<EditMovie />} />
                             <Route path='/login' element={<Login />} />
                             <Route path='/register' element={<Register />} />
@@ -32,8 +32,8 @@ function App() {
                         </Routes>
                     </main>
                 </div>
-            </Router>
-        </AuthProvider>
+            </AuthProvider>
+        </BrowserRouter>
     );
 }
 

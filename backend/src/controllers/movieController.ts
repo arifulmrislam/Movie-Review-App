@@ -3,7 +3,8 @@ import { Request, Response } from "express";
 import sequelize from "../models/sequelize";
 import User from "../models/user";
 import db from "../models";
-import { Op, Sequelize } from "sequelize";
+import { Op, Sequelize, where } from "sequelize";
+import { Multer } from "multer";
 
 const Movie = db.Movie;
 const Genre = db.Genre;
@@ -293,3 +294,38 @@ export const getAllMovies: RequestHandler = async (
         res.status(500).json({ error: "Failed to search for movies" });
     }
 };
+
+// export const getMoviesByGenre: RequestHandler = async (
+//     req: Request,
+//     res: Response
+// ): Promise<void> => {
+//     const { genreName } = req.params;
+// 
+//     try {
+//         const genre = await Genre.findOne({ where: { genre: genreName } });
+// 
+//         // Check if the genre was found
+//         if (!genre) {
+//             console.log('Genre not found:', genreName); // Debugging statement
+//             res.status(404).json({ error: "Genre not found" });
+//             return;
+//         }
+// 
+//         console.log('Found genre:', genre); // Debugging statement
+// 
+//         // Query movies by the genre's genre_id
+//         const movies = await Movie.findAll({
+//             where: { genre_id: genre.genre_id }, // Use genre.genre_id here
+//         });
+// 
+//         if (!movies.length) {
+//             res.status(404).json({ error: "No movies found for this genre" });
+//             return;
+//         }
+// 
+//         res.status(200).json(movies);
+//     } catch (error) {
+//         console.error("Error fetching movies by genre:", error);
+//         res.status(500).json({ error: "Failed to fetch movies by genre" });
+//     }
+// };
