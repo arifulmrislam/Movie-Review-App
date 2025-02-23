@@ -16,27 +16,28 @@ const Home: React.FC = () => {
                 const response = await axios.get('http://localhost:3000/api/movie');
                 const data = response.data;
 
-            const formattedMovies = data.map((movie:any) => ({
-                id: movie.movie_id,
-                title: movie.title,
-                imageUrl: movie.img,
-                averageRating: movie.averageRating || 0,
-            }));
+                const formattedMovies = data.map((movie: any) => ({
+                    id: movie.movie_id,
+                    title: movie.title,
+                    imageUrl: movie.img,
+                    averageRating: movie.averageRating || 0,
+                    genres: movie.genres?.map((g: any) => g.genre) || ['Unknown'], // Extract genre names
+                    release_yr: movie.release_yr.toString(),
+                }));
 
-            setMovies(formattedMovies);
+                setMovies(formattedMovies);
+            } catch (error) {
+                console.error('Failed to fetch movies:', error);
+            }
+        };
 
-        } catch (error) {
-            console.error('Failed to fetch movies:', error);
-        }   
-    }; 
-    
-    getMovies();
+        getMovies();
     }, []);
 
-        return (
-        <div className='-mx-4'>
-            <Hero movies={randomlySelectMovies (movies, 5)}/>
-            <div className='container mx-auto px-4'>
+    return (
+        <div className='-mx-4 px-6'>
+            <Hero movies={randomlySelectMovies(movies, 5)} />
+            <div className='container mx-auto px-2'>
                 <MovieList title='MOVIE LIST' movies={movies} />
             </div>
         </div>

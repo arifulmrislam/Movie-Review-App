@@ -1,25 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Edit, Trash } from 'lucide-react';
+import { Edit, Trash, Check } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 
 const UserMovies: React.FC = () => {
     const [movies, setMovies] = useState<any[]>([]);
-    const { user, token, logout } = useAuth(); // Add logout from useAuth
-    const [editingMovie, setEditingMovie] = useState<any | null>(null);
-    const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
-    const [releaseDate, setReleaseDate] = useState('');
-    const [publisher, setPublisher] = useState('');
-    const [genre, setGenre] = useState<string[]>([]);
-    const [imageUrl, setImageUrl] = useState<string | null>(null);
-    const navigate = useNavigate(); // Initialize useNavigate
+    const { user, token } = useAuth();
+    const [editingMovieId, setEditingMovieId] = useState<number | null>(null);
+    const [editedMovie, setEditedMovie] = useState<any | null>(null);
+    const navigate = useNavigate();
 
     // Redirect to login if user is not authenticated
     useEffect(() => {
         if (!user || !token) {
-            navigate('/login'); // Redirect to login page
+            navigate('/login');
         }
     }, [user, token, navigate]);
 
@@ -27,8 +22,6 @@ const UserMovies: React.FC = () => {
     useEffect(() => {
         if (user?.user_id) {
             fetchMovies();
-            // console.log(user.name);
-            // console.log(user.email);
         }
     }, [user]);
 
@@ -44,31 +37,32 @@ const UserMovies: React.FC = () => {
             );
             if (!response.ok) throw new Error('Failed to fetch movies');
             const data = await response.json();
-            console.log('Fetched movies:', data); // Debugging
             setMovies(data);
         } catch (error) {
             console.error('Error fetching movies:', error);
         }
     };
 
-    // Handle editing a movie
+    // Start Editing a Movie
     const handleEdit = (movie: any) => {
-        setEditingMovie(movie);
-        setTitle(movie.title);
-        setDescription(movie.description);
-        setReleaseDate(movie.release_date);
-        setPublisher(movie.publisher);
-        setGenre(movie.genre);
-        setImageUrl(movie.image_url || null);
+        setEditingMovieId(movie.movie_id);
+        setEditedMovie({ ...movie });
     };
 
-    const handleUpdateMovie = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!editingMovie) return;
+    // Handle Input Changes
+    const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement>,
+        field: string
+    ) => {
+        setEditedMovie((prev) => ({ ...prev, [field]: e.target.value }));
+    };
 
+    // Save Changes & Exit Editing Mode
+    const handleSave = async () => {
+        if (!editedMovie) return;
         try {
             const response = await fetch(
-                `http://localhost:3000/api/movie/${editingMovie.movie_id}`,
+                `http://localhost:3000/api/movie/${editedMovie.movie_id}`,
                 {
                     method: 'PUT',
                     headers: {
@@ -76,11 +70,11 @@ const UserMovies: React.FC = () => {
                         Authorization: `Bearer ${token}`,
                     },
                     body: JSON.stringify({
-                        title,
-                        description,
-                        release_date: releaseDate,
-                        publisher,
-                        genre,
+                        title: editedMovie.title,
+                        description: editedMovie.description,
+                        release_yr: editedMovie.release_yr,
+                        publisher: editedMovie.publisher,
+                        genre: editedMovie.genre,
                     }),
                 }
             );
@@ -88,7 +82,7 @@ const UserMovies: React.FC = () => {
             if (!response.ok) throw new Error('Failed to update movie');
 
             toast.success('Movie updated successfully.');
-            setEditingMovie(null);
+            setEditingMovieId(null);
             fetchMovies();
         } catch (error) {
             console.error('Error updating movie:', error);
@@ -122,41 +116,89 @@ const UserMovies: React.FC = () => {
     };
 
     return (
-
         <div className='p-8'>
-            <div>
-                <h2>{user.name}</h2>
-                <h2>{user.email}</h2>
-                <span className='bg-yellow-400 text-black text-xs font-bold rounded-full px-2 ml-1'>
-                    {movies.length}
-                </span>
+            {/* User Info */}
+            <div className='bg-white shadow-md rounded-lg p-6 flex flex-col md:flex-row items-center justify-between mb-6'>
+                <div className='flex items-center gap-4'>
+                    <div className='w-12 h-12 flex items-center justify-center bg-blue-500 text-white font-bold text-xl rounded-full'>
+                        {user.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                        <h2 className='text-lg font-semibold'>{user.name}</h2>
+                        <p className='text-gray-600'>{user.email}</p>
+                    </div>
+                </div>
+                <div className='flex items-center gap-2'>
+                    <span className='text-gray-700'>Movies Added:</span>
+                    <span className='bg-yellow-400 text-black text-xs font-bold rounded-full px-3 py-1'>
+                        {movies.length}
+                    </span>
+                </div>
             </div>
 
-            <h2 className='text-2xl font-bold mb-6'>Your Movies</h2>
-            <div className='grid gap-6 md:grid-cols-1'>
+            {/* Movie List */}
+            <h2 className='text-2xl font-bold mb-4'>Your Movies</h2>
+            <div className='flex flex-col gap-4'>
                 {movies.map((movie) => (
                     <div
                         key={movie.movie_id}
-                        className='p-6 bg-white rounded-lg shadow-md'
+                        className='p-6 bg-gray-200 rounded-lg shadow-md flex items-center justify-between'
                     >
-                        <h3 className='text-xl font-semibold'>{movie.title}</h3>
-                        <p className='text-gray-400'>{movie.release_yr}</p>
-                        <p className='text-yellow-400 text-sm'>
-                            ⭐ {movie.averageRating ? movie.averageRating.toFixed(1) : 'N/A'}
-                        </p>
-                        <img
-                            src={movie.img}
-                            alt={movie.title}
-                            className='w-20 h-32 object-cover rounded'
-                        />
+                        {/* Movie Info - Inline Editing */}
+                        <div className='flex items-center gap-4'>
+                            <img
+                                src={movie.img || '/placeholder.jpg'}
+                                alt={movie.title}
+                                className='w-16 h-24 object-cover rounded'
+                            />
+                            <div>
+                                {editingMovieId === movie.movie_id ? (
+                                    <>
+                                        <input
+                                            type='text'
+                                            value={editedMovie?.title || ''}
+                                            onChange={(e) => handleChange(e, 'title')}
+                                            className='border border-gray-400 p-1 rounded'
+                                        />
+                                        <input
+                                            type='text'
+                                            value={editedMovie.release_yr}
+                                            onChange={(e) => handleChange(e, 'release_yr')}
+                                            className='border border-gray-400 p-1 rounded mt-1'
+                                        />
+                                    </>
+                                ) : (
+                                    <>
+                                        <h3 className='text-xl font-semibold text-black'>
+                                            {movie.title}
+                                        </h3>
+                                        <p className='text-gray-600'>{movie.release_yr}</p>
+                                    </>
+                                )}
+                                <p className='text-yellow-500 text-sm'>
+                                    ⭐{' '}
+                                    {movie.averageRating ? movie.averageRating.toFixed(1) : 'N/A'}
+                                </p>
+                            </div>
+                        </div>
 
-                        <div className='mt-4 flex gap-4'>
-                            <button
-                                onClick={() => handleEdit(movie)}
-                                className='text-blue-500 hover:text-blue-700'
-                            >
-                                <Edit className='w-5 h-5' />
-                            </button>
+                        {/* Action Buttons */}
+                        <div className='flex gap-4'>
+                            {editingMovieId === movie.movie_id ? (
+                                <button
+                                    onClick={handleSave}
+                                    className='text-green-500 hover:text-green-700'
+                                >
+                                    <Check className='w-5 h-5' />
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={() => handleEdit(movie)}
+                                    className='text-blue-500 hover:text-blue-700'
+                                >
+                                    <Edit className='w-5 h-5' />
+                                </button>
+                            )}
                             <button
                                 onClick={() => handleDelete(movie.movie_id)}
                                 className='text-red-500 hover:text-red-700'
@@ -167,49 +209,8 @@ const UserMovies: React.FC = () => {
                     </div>
                 ))}
             </div>
-
-            {editingMovie && (
-                <div className='mt-8 p-6 bg-gray-100 rounded-lg shadow-md'>
-                    <h3 className='text-xl font-bold mb-4'>Edit Movie</h3>
-                    <form onSubmit={handleUpdateMovie}>
-                        <input
-                            type='text'
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            className='w-full p-2 border border-gray-300 rounded mb-4'
-                            placeholder='Movie Title'
-                        />
-                        <textarea
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                            className='w-full p-2 border border-gray-300 rounded mb-4'
-                            placeholder='Description'
-                        />
-                        <input
-                            type='date'
-                            value={releaseDate}
-                            onChange={(e) => setReleaseDate(e.target.value)}
-                            className='w-full p-2 border border-gray-300 rounded mb-4'
-                        />
-                        <input
-                            type='text'
-                            value={publisher}
-                            onChange={(e) => setPublisher(e.target.value)}
-                            className='w-full p-2 border border-gray-300 rounded mb-4'
-                            placeholder='Publisher'
-                        />
-                        <button
-                            type='submit'
-                            className='bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600'
-                        >
-                            Update Movie
-                        </button>
-                    </form>
-                </div>
-            )}
         </div>
     );
 };
 
 export default UserMovies;
-

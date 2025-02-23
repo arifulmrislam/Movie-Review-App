@@ -8,157 +8,157 @@ import { Search, Menu, X, User, LogOut, PlusCircle } from 'lucide-react';
 import logo from '../assets/logo-6-Photoroom.png';
 
 const Navbar: React.FC = () => {
-  const { user, logout } = useAuth();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const navigate = useNavigate();
+    const { user, logout } = useAuth();
+    const [searchQuery, setSearchQuery] = useState('');
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const navigate = useNavigate();
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/search?query=${encodeURIComponent(searchQuery)}`);
-      setSearchQuery('');
-    }
-  };
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (searchQuery.trim()) {
+            navigate(`/search?query=${encodeURIComponent(searchQuery)}`);
+            setSearchQuery('');
+        }
+    };
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+    const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
-  return (
-    <div className='bg-gradient-to-r from-[#FA320A] to-[#FF6B4A] text-white shadow-lg'>
-      <nav className='container mx-auto px-4 py-3'>
-        <div className='flex items-center justify-between'>
-          {/* Logo */}
-          <Link to='/' className='flex items-center space-x-2'>
-            <img
-              className='h-12 w-auto'
-              src='https://res.cloudinary.com/di835w1z1/image/upload/v1726561472/logo_gdap68.png'
-              alt='Logo'
-            />
-          </Link>
+    return (
+        <div className='bg-gradient-to-r from-[#FA320A] to-[#FF6B4A] text-white shadow-lg'>
+            <nav className='container mx-auto px-4 py-3'>
+                <div className='flex items-center justify-between'>
+                    {/* Logo */}
+                    <Link to='/' className='flex items-center space-x-2'>
+                        <img
+                            className='h-12 w-auto'
+                            src='https://res.cloudinary.com/di835w1z1/image/upload/v1726561472/logo_gdap68.png'
+                            alt='Logo'
+                        />
+                    </Link>
 
-          {/* Centered Search Bar */}
-          <div className='flex-1 flex justify-center'>
-            <form onSubmit={handleSearch} className='relative w-full max-w-lg'>
-              <input
-                type='search'
-                placeholder='Search movies...'
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className='w-full px-4 py-2 pl-10 bg-white/10 rounded-full placeholder-white/70 text-white transition-all focus:outline-none focus:bg-white/20 focus:ring-2 focus:ring-white/20'
-              />
-              <button type='submit' className='absolute left-3 top-2.5'>
-                <Search className='h-5 w-5 text-white/70' />
-              </button>
-            </form>
-          </div>
+                    {/* Centered Search Bar */}
+                    <div className='flex-1 flex justify-center'>
+                        <form onSubmit={handleSearch} className='relative w-full max-w-lg'>
+                            <input
+                                type='search'
+                                placeholder='Search movies...'
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className='w-full px-4 py-2 pl-10 bg-white/10 rounded-full placeholder-white/70 text-white transition-all focus:outline-none focus:bg-white/20 focus:ring-2 focus:ring-white/20'
+                            />
+                            <button type='submit' className='absolute left-3 top-2.5'>
+                                <Search className='h-5 w-5 text-white/70' />
+                            </button>
+                        </form>
+                    </div>
 
-          {/* User Links */}
-          <div className='hidden md:flex items-center space-x-8'>
-            {user ? (
-              <>
-                <Link
-                  to='/user-movies'
-                  className='hover:text-gray-200 transition-colors'
-                >
-                  Hi, {user.name.split(' ')[0].toLowerCase()}
-                </Link>
-                <Link
-                  to='/add-movie'
-                  className='hover:text-gray-200 transition-colors'
-                >
-                  <span>Add Movie</span>
-                </Link>
-                <button
-                  onClick={logout}
-                  className='hover:text-gray-200 transition-colors'
-                >
-                  <span>Logout</span>
-                </button>
-              </>
-            ) : (
-              <>
-                <Link
-                  to='/login'
-                  className='bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-full transition-all'
-                >
-                  Login
-                </Link>
-                <Link
-                  to='/register'
-                  className='bg-white text-[#FA320A] font-semibold py-2 px-4 rounded-full hover:bg-gray-100 transition-all'
-                >
-                  Register
-                </Link>
-              </>
-            )}
-          </div>
+                    {/* User Links */}
+                    <div className='hidden md:flex items-center space-x-8'>
+                        {user ? (
+                            <>
+                                <Link
+                                    to='/user-movies'
+                                    className='hover:text-gray-200 transition-colors'
+                                >
+                                    Hi, {user.name.split(' ')[0].toLowerCase()}
+                                </Link>
+                                <Link
+                                    to='/add-movie'
+                                    className='hover:text-gray-200 transition-colors'
+                                >
+                                    <span>Add Movie</span>
+                                </Link>
+                                <button
+                                    onClick={logout}
+                                    className='hover:text-gray-200 transition-colors'
+                                >
+                                    <span>Logout</span>
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <Link
+                                    to='/login'
+                                    className='bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-full transition-all'
+                                >
+                                    Login
+                                </Link>
+                                <Link
+                                    to='/register'
+                                    className='bg-white text-[#FA320A] font-semibold py-2 px-4 rounded-full hover:bg-gray-100 transition-all'
+                                >
+                                    Register
+                                </Link>
+                            </>
+                        )}
+                    </div>
 
-          {/* Mobile Menu Button */}
-          <button className='md:hidden' onClick={toggleMenu}>
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+                    {/* Mobile Menu Button */}
+                    <button className='md:hidden' onClick={toggleMenu}>
+                        {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                    </button>
+                </div>
+
+                {/* Mobile menu */}
+                {isMenuOpen && (
+                    <div className='md:hidden px-4 py-2 space-y-3'>
+                        <form onSubmit={handleSearch} className='relative'>
+                            <input
+                                type='search'
+                                placeholder='Search movies...'
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className='w-full px-4 py-2 pl-10 bg-white/10 rounded-full placeholder-white/70 text-white transition-all focus:outline-none focus:bg-white/20 focus:ring-2 focus:ring-white/20'
+                            />
+                            <button type='submit' className='absolute left-3 top-2.5'>
+                                <Search className='h-5 w-5 text-white/70' />
+                            </button>
+                        </form>
+
+                        {user ? (
+                            <>
+                                <Link
+                                    to='/add-movie'
+                                    className='block py-2 hover:bg-white/10 rounded-lg transition-all'
+                                >
+                                    Add Movie
+                                </Link>
+                                <Link
+                                    to='/user-movies'
+                                    className='block py-2 hover:bg-white/10 rounded-lg transition-all'
+                                >
+                                    Your Movies
+                                </Link>
+                                <button
+                                    onClick={logout}
+                                    className='block w-full text-left py-2 hover:bg-white/10 rounded-lg transition-all'
+                                >
+                                    Logout
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <Link
+                                    to='/login'
+                                    className='block py-2 hover:bg-white/10 rounded-lg transition-all'
+                                >
+                                    <User size={18} className='inline mr-2' />
+                                    Login
+                                </Link>
+                                <Link
+                                    to='/register'
+                                    className='block py-2 hover:bg-white/10 rounded-lg transition-all'
+                                >
+                                    <User size={18} className='inline mr-2' />
+                                    Register
+                                </Link>
+                            </>
+                        )}
+                    </div>
+                )}
+            </nav>
         </div>
-
-        {/* Mobile menu */}
-        {isMenuOpen && (
-          <div className='md:hidden px-4 py-2 space-y-3'>
-            <form onSubmit={handleSearch} className='relative'>
-              <input
-                type='search'
-                placeholder='Search movies...'
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className='w-full px-4 py-2 pl-10 bg-white/10 rounded-full placeholder-white/70 text-white transition-all focus:outline-none focus:bg-white/20 focus:ring-2 focus:ring-white/20'
-              />
-              <button type='submit' className='absolute left-3 top-2.5'>
-                <Search className='h-5 w-5 text-white/70' />
-              </button>
-            </form>
-
-            {user ? (
-              <>
-                <Link
-                  to='/add-movie'
-                  className='block py-2 hover:bg-white/10 rounded-lg transition-all'
-                >
-                  Add Movie
-                </Link>
-                <Link
-                  to='/user-movies'
-                  className='block py-2 hover:bg-white/10 rounded-lg transition-all'
-                >
-                  Your Movies
-                </Link>
-                <button
-                  onClick={logout}
-                  className='block w-full text-left py-2 hover:bg-white/10 rounded-lg transition-all'
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <Link
-                  to='/login'
-                  className='block py-2 hover:bg-white/10 rounded-lg transition-all'
-                >
-                  <User size={18} className='inline mr-2' />
-                  Login
-                </Link>
-                <Link
-                  to='/register'
-                  className='block py-2 hover:bg-white/10 rounded-lg transition-all'
-                >
-                  <User size={18} className='inline mr-2' />
-                  Register
-                </Link>
-              </>
-            )}
-          </div>
-        )}
-      </nav>
-    </div>
-  );
+    );
 };
 
 export default Navbar;

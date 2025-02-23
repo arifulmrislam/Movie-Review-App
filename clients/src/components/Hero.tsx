@@ -92,7 +92,7 @@ export default function Hero({ movies }) {
             {/* Right Scroll Button */}
             <button
                 onClick={scrollRight}
-                className='absolute right-4 top-1/2 -translate-y-1/2 bg-red-500/50 hover:bg-red-500 hover:scale-110 p-2 rounded-full text-white z-10 transition-all duration-300'
+                className='absolute right-2 top-1/2 -translate-y-1/2 bg-red-500/50 hover:bg-red-500 hover:scale-110 p-2 rounded-full text-white z-10 transition-all duration-300'
             >
                 <ChevronRight className='h-6 w-6' />
             </button>
