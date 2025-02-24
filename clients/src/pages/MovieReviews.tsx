@@ -413,7 +413,7 @@ const MovieReviews: React.FC<MovieReviewsProps> = ({
             });
 
             if (!response.ok) throw new Error('Failed to submit review');
-
+            
             // Re-fetch updated reviews
             const fetchReviews = async () => {
                 try {
@@ -439,6 +439,7 @@ const MovieReviews: React.FC<MovieReviewsProps> = ({
             setReviewToEdit(null);
         } catch (error) {
             console.error('Error submitting review:', error);
+            toast.error('You have already reviewed this movie.');
         }
     };
 

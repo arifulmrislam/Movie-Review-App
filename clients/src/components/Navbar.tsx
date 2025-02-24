@@ -5,7 +5,6 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Search, Menu, X, User, LogOut, PlusCircle } from 'lucide-react';
-import logo from '../assets/logo-6-Photoroom.png';
 
 const Navbar: React.FC = () => {
     const { user, logout } = useAuth();
@@ -34,8 +33,9 @@ const Navbar: React.FC = () => {
                             src='https://res.cloudinary.com/di835w1z1/image/upload/v1726561472/logo_gdap68.png'
                             alt='Logo'
                         />
+                        <h1>Movie Review App</h1>
                     </Link>
-
+                    
                     {/* Centered Search Bar */}
                     <div className='flex-1 flex justify-center'>
                         <form onSubmit={handleSearch} className='relative w-full max-w-lg'>
