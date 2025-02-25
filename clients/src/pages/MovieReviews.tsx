@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+// import { useParams } from 'react-router-dom';
 import { User, Send, Edit, Trash } from 'lucide-react';
 import { toast } from 'react-toastify';
 
@@ -137,7 +137,8 @@ const MovieReviews: React.FC<MovieReviewsProps> = ({
             setReviewToEdit(null);
         } catch (error) {
             console.error('Error submitting review:', error);
-            toast.error('Failed to submit review.');
+            // toast.error('Failed to submit review.');
+            toast.error('You have already reviewed this movie.');
         }
     };
 
@@ -184,58 +185,44 @@ const MovieReviews: React.FC<MovieReviewsProps> = ({
     };
 
     const handleDelete = async (rr_id: number | undefined) => {
-        if (!rr_id) {
-            console.error('Invalid review ID for deletion');
-            toast.error('Invalid review ID.');
-            return;
-        }
+      if (!rr_id) {
+        toast.error('Invalid review ID.');
+        return;
+      }
 
-        const token = localStorage.getItem('token');
-        if (!token) {
-            console.error('User is not logged in.');
-            toast.error('You must be logged in to delete a review.');
-            return;
-        }
+      const confirmDelete = window.confirm(
+        'Are you sure you want to delete this review?'
+      );
+      if (!confirmDelete) return; // Exit if user cancels
 
-        const decodedToken = JSON.parse(atob(token.split('.')[1]));
-        const userId = decodedToken.id;
+      const token = localStorage.getItem('token');
+      if (!token) {
+        toast.error('You must be logged in to delete a review.');
+        return;
+      }
 
-        const selectedReview = reviews.find((r) => r.rr_id === rr_id);
-        if (!selectedReview) {
-            console.error('Review not found for deletion');
-            toast.error('Review not found.');
-            return;
-        }
+      try {
+        const response = await fetch(
+          `http://localhost:3000/api/review/${rr_id}`,
+          {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
 
-        try {
-            console.log('Attempting to delete review with ID:', rr_id);
+        if (!response.ok) throw new Error('Failed to delete review');
 
-            const response = await fetch(
-                `http://localhost:3000/api/review/${rr_id}`,
-                {
-                    method: 'DELETE',
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
+        setReviews((prevReviews) =>
+          prevReviews.filter((review) => review.rr_id !== rr_id)
+        );
 
-            if (!response.ok) throw new Error('Failed to delete review');
-
-            // Remove the review from the list
-            setReviews((prevReviews) =>
-                prevReviews.filter((review) => review.rr_id !== rr_id)
-            );
-
-            toast.success('Review deleted successfully.');
-
-            // Re-fetch movie details to update the average rating
-            onReviewAdded(); // This will trigger a re-fetch of the movie details
-        } catch (error) {
-            console.error('Error deleting review:', error);
-            toast.error('Failed to delete review.');
-        }
+        toast.success('Review deleted successfully.');
+        onReviewAdded(); // Update average rating
+      } catch (error) {
+        toast.error('Failed to delete review.');
+      }
     };
+
 
     return (
         <div>
