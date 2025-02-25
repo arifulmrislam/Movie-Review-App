@@ -3,6 +3,6 @@ import { uploadImage } from "../controllers/uploadController";
 
 const router: Router = Router();
 
-router.post("/", uploadImage); // Ensure `uploadImage` is a valid function
+router.post("/", uploadImage);
 
 export default router;
