@@ -9,7 +9,7 @@ const UserMovies: React.FC = () => {
     const { user, token } = useAuth();
     const [editingMovieId, setEditingMovieId] = useState<number | null>(null);
     const [editedMovie, setEditedMovie] = useState<any | null>(null);
-    const [selectedFile, setSelectedFile] = useState<any | null>(null);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -17,7 +17,6 @@ const UserMovies: React.FC = () => {
             navigate('/login');
         }
     }, [user, token, navigate]);
-
 
     useEffect(() => {
         if (user?.user_id) {
@@ -38,19 +37,16 @@ const UserMovies: React.FC = () => {
             if (!response.ok) throw new Error('Failed to fetch movies');
             const data = await response.json();
             setMovies(data);
-            console.log(data);
         } catch (error) {
             console.error('Error fetching movies:', error);
         }
     };
 
-    // Start Editing a Movie
     const handleEdit = (movie: any) => {
         setEditingMovieId(movie.movie_id);
         setEditedMovie({ ...movie });
     };
 
-    // Handle Input Changes
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement>,
         field: string
@@ -58,10 +54,40 @@ const UserMovies: React.FC = () => {
         setEditedMovie((prev) => ({ ...prev, [field]: e.target.value }));
     };
 
-    // Save Changes & Exit Editing Mode
+    const handleImageUpload = async (file: File) => {
+        const formData = new FormData();
+        formData.append('image', file); // Use 'image' as the field name
+
+        try {
+            const response = await fetch('http://localhost:3000/api/upload', {
+                method: 'POST',
+                body: formData,
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                return data.imageUrl; // Return the uploaded image URL
+            } else {
+                throw new Error(data.error || 'Failed to upload image');
+            }
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            throw error;
+        }
+    };
+
     const handleSave = async () => {
         if (!editedMovie) return;
+
         try {
+            let imageUrl = editedMovie.img;
+
+            // Upload new image if selected
+            if (selectedFile) {
+                imageUrl = await handleImageUpload(selectedFile);
+            }
+
+            // Update the movie with the new image URL
             const response = await fetch(
                 `http://localhost:3000/api/movie/${editedMovie.movie_id}`,
                 {
@@ -77,6 +103,7 @@ const UserMovies: React.FC = () => {
                         producer: editedMovie.producer,
                         genre: editedMovie.genre,
                         desc: editedMovie.desc,
+                        img: imageUrl, // Include the updated image URL
                     }),
                 }
             );
@@ -85,14 +112,14 @@ const UserMovies: React.FC = () => {
 
             toast.success('Movie updated successfully.');
             setEditingMovieId(null);
-            fetchMovies();
+            setSelectedFile(null); // Clear the selected file
+            fetchMovies(); // Refresh the movie list
         } catch (error) {
             console.error('Error updating movie:', error);
             toast.error('Failed to update movie.');
         }
     };
 
-    // Handle movie deletion
     const handleDelete = async (movieId: number) => {
         try {
             const response = await fetch(
@@ -137,7 +164,6 @@ const UserMovies: React.FC = () => {
                 </div>
             </div>
 
-            {/* Movie List */}
             <h2 className='text-2xl font-bold mb-4'>Your Movies</h2>
             <div className='flex flex-col gap-4'>
                 {movies.map((movie) => (
@@ -145,7 +171,6 @@ const UserMovies: React.FC = () => {
                         key={movie.movie_id}
                         className='p-6 bg-gray-200 rounded-lg shadow-md flex items-center justify-between'
                     >
-                        {/* Movie Info - Inline Editing */}
                         <div className='flex items-center gap-4'>
                             <img
                                 src={movie.img || '/placeholder.jpg'}
@@ -185,7 +210,7 @@ const UserMovies: React.FC = () => {
                                         />
                                         <input
                                             type='text'
-                                            value={editedMovie.genres.map(g => g.genre).join(', ')}
+                                            value={editedMovie.genres.map((g) => g.genre).join(', ')}
                                             onChange={(e) => handleChange(e.target.value)}
                                             className='border border-gray-400 p-1 rounded w-full mt-2'
                                             placeholder='Genres (comma-separated)'
@@ -195,7 +220,14 @@ const UserMovies: React.FC = () => {
                                             value={editedMovie.desc}
                                             onChange={(e) => handleChange(e, 'desc')}
                                             className='border border-gray-400 p-1 rounded w-full mt-2'
-                                            placeholder='desc'
+                                            placeholder='Description'
+                                        />
+                                        <input
+                                            type='file'
+                                            onChange={(e) =>
+                                                setSelectedFile(e.target.files?.[0] || null)
+                                            }
+                                            className='border border-gray-400 p-1 rounded w-full mt-2'
                                         />
                                     </>
                                 ) : (
@@ -228,7 +260,6 @@ const UserMovies: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Action Buttons */}
                         <div className='flex gap-4'>
                             {editingMovieId === movie.movie_id ? (
                                 <button

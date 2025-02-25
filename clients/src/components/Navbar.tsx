@@ -24,16 +24,15 @@ const Navbar: React.FC = () => {
 
     return (
         <div className='bg-[#FA320A] text-white shadow-lg'>
-            <nav className='container mx-auto px-10 py-3'>
+            <nav className='container mx-auto px-10 py-5'>
                 <div className='flex items-center justify-between'>
-                    {/* Logo */}
                     <Link to='/' className='flex items-center space-x-2'>
-                        <img
+                        {/* <img
                             className='h-12 w-auto'
-                            src='https://res.cloudinary.com/di835w1z1/image/upload/v1726561472/logo_gdap68.png'
-                            alt='Logo'
-                        />
-                        <h1>Movie Review App</h1>
+                            // src='https://res.cloudinary.com/di835w1z1/image/upload/v1726561472/logo_gdap68.png'
+                            // alt='Logo'
+                        /> */}
+                        <h1 className='text-2xl font-bold'>Movie Review App</h1>
                     </Link>
                     
                     {/* Centered Search Bar */}
