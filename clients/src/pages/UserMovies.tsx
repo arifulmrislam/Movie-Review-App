@@ -9,16 +9,16 @@ const UserMovies: React.FC = () => {
     const { user, token } = useAuth();
     const [editingMovieId, setEditingMovieId] = useState<number | null>(null);
     const [editedMovie, setEditedMovie] = useState<any | null>(null);
+    const [selectedFile, setSelectedFile] = useState<any | null>(null);
     const navigate = useNavigate();
 
-    // Redirect to login if user is not authenticated
     useEffect(() => {
         if (!user || !token) {
             navigate('/login');
         }
     }, [user, token, navigate]);
 
-    // Fetch user's movies
+
     useEffect(() => {
         if (user?.user_id) {
             fetchMovies();
@@ -38,6 +38,7 @@ const UserMovies: React.FC = () => {
             if (!response.ok) throw new Error('Failed to fetch movies');
             const data = await response.json();
             setMovies(data);
+            console.log(data);
         } catch (error) {
             console.error('Error fetching movies:', error);
         }
@@ -71,10 +72,11 @@ const UserMovies: React.FC = () => {
                     },
                     body: JSON.stringify({
                         title: editedMovie.title,
-                        description: editedMovie.description,
                         release_yr: editedMovie.release_yr,
-                        publisher: editedMovie.publisher,
+                        length: editedMovie.length,
+                        producer: editedMovie.producer,
                         genre: editedMovie.genre,
+                        desc: editedMovie.desc,
                     }),
                 }
             );
@@ -117,7 +119,6 @@ const UserMovies: React.FC = () => {
 
     return (
         <div className='p-8'>
-            {/* User Info */}
             <div className='bg-white shadow-md rounded-lg p-6 flex flex-col md:flex-row items-center justify-between mb-6'>
                 <div className='flex items-center gap-4'>
                     <div className='w-12 h-12 flex items-center justify-center bg-blue-500 text-white font-bold text-xl rounded-full'>
@@ -149,7 +150,7 @@ const UserMovies: React.FC = () => {
                             <img
                                 src={movie.img || '/placeholder.jpg'}
                                 alt={movie.title}
-                                className='w-16 h-24 object-cover rounded'
+                                className='w-44 h-60 object-cover rounded'
                             />
                             <div>
                                 {editingMovieId === movie.movie_id ? (
@@ -158,13 +159,43 @@ const UserMovies: React.FC = () => {
                                             type='text'
                                             value={editedMovie?.title || ''}
                                             onChange={(e) => handleChange(e, 'title')}
-                                            className='border border-gray-400 p-1 rounded'
+                                            className='border border-gray-400 p-1 rounded w-full'
+                                            placeholder='Title'
                                         />
                                         <input
                                             type='text'
                                             value={editedMovie.release_yr}
                                             onChange={(e) => handleChange(e, 'release_yr')}
-                                            className='border border-gray-400 p-1 rounded mt-1'
+                                            className='border border-gray-400 p-1 rounded w-full mt-2'
+                                            placeholder='Release Year'
+                                        />
+                                        <input
+                                            type='text'
+                                            value={editedMovie.length}
+                                            onChange={(e) => handleChange(e, 'length')}
+                                            className='border border-gray-400 p-1 rounded w-full mt-2'
+                                            placeholder='Length'
+                                        />
+                                        <input
+                                            type='text'
+                                            value={editedMovie.producer}
+                                            onChange={(e) => handleChange(e, 'producer')}
+                                            className='border border-gray-400 p-1 rounded w-full mt-2'
+                                            placeholder='Producer'
+                                        />
+                                        <input
+                                            type='text'
+                                            value={editedMovie.genres.map(g => g.genre).join(', ')}
+                                            onChange={(e) => handleChange(e.target.value)}
+                                            className='border border-gray-400 p-1 rounded w-full mt-2'
+                                            placeholder='Genres (comma-separated)'
+                                        />
+                                        <input
+                                            type='text'
+                                            value={editedMovie.desc}
+                                            onChange={(e) => handleChange(e, 'desc')}
+                                            className='border border-gray-400 p-1 rounded w-full mt-2'
+                                            placeholder='desc'
                                         />
                                     </>
                                 ) : (
@@ -173,8 +204,23 @@ const UserMovies: React.FC = () => {
                                             {movie.title}
                                         </h3>
                                         <p className='text-gray-600'>{movie.release_yr}</p>
+                                        <p className='text-gray-600'>{movie.length}</p>
+                                        <p className='text-gray-600'>{movie.producer}</p>
+                                        <div className='text-gray-600'>
+                                            Genres:
+                                            {movie.genres.length > 0 ? (
+                                                movie.genres.map((genreItem, index) => (
+                                                    <span key={index} className='mr-2'>
+                                                        {genreItem.genre}
+                                                    </span>
+                                                ))
+                                            ) : (
+                                                <p>No genres available</p>
+                                            )}
+                                        </div>
                                     </>
                                 )}
+                                <p className='text-gray-600'>{movie.desc}</p>
                                 <p className='text-yellow-500 text-sm'>
                                     ⭐{' '}
                                     {movie.averageRating ? movie.averageRating.toFixed(1) : 'N/A'}
