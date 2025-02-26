@@ -1,19 +1,68 @@
 import React, { useEffect, useState } from 'react';
-// import { useParams } from 'react-router-dom';
-import { User, Send, Edit, Trash } from 'lucide-react';
+import { User, Send, Edit, Trash, X, AlertTriangle } from 'lucide-react';
 import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface Review {
     rr_id: number;
     rating: number;
     review: string;
-    user: { name: string };
+    user: { name: string; id: number };
 }
 
 interface MovieReviewsProps {
     movieId: string;
     onReviewAdded: () => void;
 }
+
+// Reusable Confirmation Modal Component
+const ConfirmationModal = ({
+    isOpen,
+    onClose,
+    onConfirm,
+    message,
+}: {
+    isOpen: boolean;
+    onClose: () => void;
+    onConfirm: () => void;
+    message: string;
+}) => {
+    if (!isOpen) return null;
+
+    return (
+        <div className='fixed inset-0 flex items-center justify-center bg-opacity-50 z-50'>
+            <div className='bg-white p-6 rounded-lg shadow-lg max-w-md w-full'>
+                <div className='flex justify-between items-center mb-4'>
+                    <h2 className='text-xl font-semibold flex items-center gap-2'>
+                        <AlertTriangle className='w-6 h-6 text-yellow-500' />
+                        Confirm Action
+                    </h2>
+                    <button
+                        onClick={onClose}
+                        className='text-gray-500 hover:text-gray-700'
+                    >
+                        <X className='w-6 h-6' />
+                    </button>
+                </div>
+                <p className='text-gray-700 mb-6'>{message}</p>
+                <div className='flex justify-end gap-4'>
+                    <button
+                        onClick={onClose}
+                        className='bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors'
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={onConfirm}
+                        className='bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors'
+                    >
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 const MovieReviews: React.FC<MovieReviewsProps> = ({
     movieId,
@@ -25,6 +74,8 @@ const MovieReviews: React.FC<MovieReviewsProps> = ({
     const [editMode, setEditMode] = useState(false);
     const [reviewToEdit, setReviewToEdit] = useState<Review | null>(null);
     const [loggedInUserId, setLoggedInUserId] = useState<number | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
+    const [reviewToDelete, setReviewToDelete] = useState<number | null>(null); // State for review to delete
 
     useEffect(() => {
         const fetchReviews = async () => {
@@ -137,7 +188,6 @@ const MovieReviews: React.FC<MovieReviewsProps> = ({
             setReviewToEdit(null);
         } catch (error) {
             console.error('Error submitting review:', error);
-            // toast.error('Failed to submit review.');
             toast.error('You have already reviewed this movie.');
         }
     };
@@ -184,45 +234,50 @@ const MovieReviews: React.FC<MovieReviewsProps> = ({
         setRating(selectedReview.rating);
     };
 
-    const handleDelete = async (rr_id: number | undefined) => {
-      if (!rr_id) {
-        toast.error('Invalid review ID.');
-        return;
-      }
+    const handleDelete = (rr_id: number | undefined) => {
+        if (!rr_id) {
+            toast.error('Invalid review ID.');
+            return;
+        }
 
-      const confirmDelete = window.confirm(
-        'Are you sure you want to delete this review?'
-      );
-      if (!confirmDelete) return; // Exit if user cancels
-
-      const token = localStorage.getItem('token');
-      if (!token) {
-        toast.error('You must be logged in to delete a review.');
-        return;
-      }
-
-      try {
-        const response = await fetch(
-          `http://localhost:3000/api/review/${rr_id}`,
-          {
-            method: 'DELETE',
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
-        if (!response.ok) throw new Error('Failed to delete review');
-
-        setReviews((prevReviews) =>
-          prevReviews.filter((review) => review.rr_id !== rr_id)
-        );
-
-        toast.success('Review deleted successfully.');
-        onReviewAdded(); // Update average rating
-      } catch (error) {
-        toast.error('Failed to delete review.');
-      }
+        // Open the confirmation modal
+        setReviewToDelete(rr_id);
+        setIsModalOpen(true);
     };
 
+    const handleDeleteConfirm = async () => {
+        if (reviewToDelete !== null) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                toast.error('You must be logged in to delete a review.');
+                return;
+            }
+
+            try {
+                const response = await fetch(
+                    `http://localhost:3000/api/review/${reviewToDelete}`,
+                    {
+                        method: 'DELETE',
+                        headers: { Authorization: `Bearer ${token}` },
+                    }
+                );
+
+                if (!response.ok) throw new Error('Failed to delete review');
+
+                setReviews((prevReviews) =>
+                    prevReviews.filter((review) => review.rr_id !== reviewToDelete)
+                );
+
+                toast.success('Review deleted successfully.');
+                onReviewAdded(); // Update average rating
+            } catch (error) {
+                toast.error('Failed to delete review.');
+            } finally {
+                setIsModalOpen(false);
+                setReviewToDelete(null);
+            }
+        }
+    };
 
     return (
         <div>
@@ -245,9 +300,7 @@ const MovieReviews: React.FC<MovieReviewsProps> = ({
                                     key={value}
                                     type='button'
                                     onClick={() => setRating(value)}
-                                    className={`text-3xl ${value <= (rating || 0)
-                                        ? 'text-yellow-400'
-                                        : 'text-gray-300'
+                                    className={`text-3xl ${value <= (rating || 0) ? 'text-yellow-400' : 'text-gray-300'
                                         } hover:text-yellow-500 transition-colors`}
                                 >
                                     ★
@@ -294,9 +347,7 @@ const MovieReviews: React.FC<MovieReviewsProps> = ({
                             <div className='flex justify-between items-center'>
                                 <div className='flex items-center'>
                                     <User className='w-6 h-6 mr-2 text-gray-600' />
-                                    <strong className='text-gray-900'>
-                                        {review.user?.name}
-                                    </strong>
+                                    <strong className='text-gray-900'>{review.user?.name}</strong>
                                 </div>
                                 {loggedInUserId === review.user.id && (
                                     <div className='flex space-x-3'>
@@ -326,6 +377,14 @@ const MovieReviews: React.FC<MovieReviewsProps> = ({
                     ))}
                 </div>
             </div>
+
+            {/* Confirmation Modal */}
+            <ConfirmationModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onConfirm={handleDeleteConfirm}
+                message='Are you sure you want to delete this review? This action cannot be undone.'
+            />
         </div>
     );
 };

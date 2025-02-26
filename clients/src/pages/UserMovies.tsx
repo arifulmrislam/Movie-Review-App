@@ -11,9 +11,56 @@ import {
     UserCircle,
     List,
     FileText,
+    X,
+    AlertTriangle,
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+
+const ConfirmationModal = ({
+    isOpen,
+    onClose,
+    onConfirm,
+    message,
+}: {
+    isOpen: boolean;
+    onClose: () => void;
+    onConfirm: () => void;
+    message: string;
+}) => {
+    if (!isOpen) return null;
+
+    return (
+        <div className='fixed inset-0 flex items-center justify-center bg-opacity-50 z-50'>
+            <div className='bg-white p-6 rounded-lg shadow-lg max-w-md w-full'>
+                <div className='flex justify-between items-center mb-4'>
+                    <h2 className='text-xl font-semibold flex items-center gap-2'>
+                        <AlertTriangle className='w-6 h-6 text-yellow-500' />
+                        Confirm Action
+                    </h2>
+                    <button onClick={onClose} className='text-gray-500 hover:text-gray-700'>
+                        <X className='w-6 h-6' />
+                    </button>
+                </div>
+                <p className='text-gray-700 mb-6'>{message}</p>
+                <div className='flex justify-end gap-4'>
+                    <button
+                        onClick={onClose}
+                        className='bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors'
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={onConfirm}
+                        className='bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors'
+                    >
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 const UserMovies: React.FC = () => {
     const [movies, setMovies] = useState<any[]>([]);
@@ -21,6 +68,8 @@ const UserMovies: React.FC = () => {
     const [editingMovieId, setEditingMovieId] = useState<number | null>(null);
     const [editedMovie, setEditedMovie] = useState<any | null>(null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [movieToDelete, setMovieToDelete] = useState<number | null>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -55,19 +104,27 @@ const UserMovies: React.FC = () => {
 
     const handleEdit = (movie: any) => {
         setEditingMovieId(movie.movie_id);
-        setEditedMovie({ ...movie });
+        setEditedMovie({
+            ...movie,
+            genre: movie.genres ? movie.genres.map((g: any) => g.genre) : [],
+        });
     };
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement>,
         field: string
     ) => {
-        setEditedMovie((prev) => ({ ...prev, [field]: e.target.value }));
+        if (field === 'genre') {
+            const selectedGenres = e.target.value.split(',').map((g) => g.trim());
+            setEditedMovie((prev) => ({ ...prev, [field]: selectedGenres }));
+        } else {
+            setEditedMovie((prev) => ({ ...prev, [field]: e.target.value }));
+        }
     };
 
     const handleImageUpload = async (file: File) => {
         const formData = new FormData();
-        formData.append('image', file); // Use 'image' as the field name
+        formData.append('image', file);
 
         try {
             const response = await fetch('http://localhost:3000/api/upload', {
@@ -77,7 +134,7 @@ const UserMovies: React.FC = () => {
             const data = await response.json();
 
             if (data.success) {
-                return data.imageUrl; // Return the uploaded image URL
+                return data.imageUrl;
             } else {
                 throw new Error(data.error || 'Failed to upload image');
             }
@@ -93,12 +150,10 @@ const UserMovies: React.FC = () => {
         try {
             let imageUrl = editedMovie.img;
 
-            // Upload new image if selected
             if (selectedFile) {
                 imageUrl = await handleImageUpload(selectedFile);
             }
 
-            // Update the movie with the new image URL
             const response = await fetch(
                 `http://localhost:3000/api/movie/${editedMovie.movie_id}`,
                 {
@@ -114,7 +169,7 @@ const UserMovies: React.FC = () => {
                         producer: editedMovie.producer,
                         genre: editedMovie.genre,
                         desc: editedMovie.desc,
-                        img: imageUrl, // Include the updated image URL
+                        img: imageUrl,
                     }),
                 }
             );
@@ -123,37 +178,50 @@ const UserMovies: React.FC = () => {
 
             toast.success('Movie updated successfully.');
             setEditingMovieId(null);
-            setSelectedFile(null); // Clear the selected file
-            fetchMovies(); // Refresh the movie list
+            setSelectedFile(null);
+            fetchMovies();
         } catch (error) {
             console.error('Error updating movie:', error);
             toast.error('Failed to update movie.');
         }
     };
 
-    const handleDelete = async (movieId: number) => {
-        try {
-            const response = await fetch(
-                `http://localhost:3000/api/movie/${movieId}`,
-                {
-                    method: 'DELETE',
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
+    const handleDeleteConfirm = async () => {
+        if (movieToDelete !== null) {
+            try {
+                console.log('Deleting movie with ID:', movieToDelete);
+                const response = await fetch(
+                    `http://localhost:3000/api/movie/${movieToDelete}`,
+                    {
+                        method: 'DELETE',
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
 
-            if (!response.ok) throw new Error('Failed to delete movie');
+                if (!response.ok) throw new Error('Failed to delete movie');
 
-            toast.success('Movie deleted successfully.');
-            setMovies((prevMovies) =>
-                prevMovies.filter((movie) => movie.movie_id !== movieId)
-            );
-        } catch (error) {
-            console.error('Error deleting movie:', error);
-            toast.error('Failed to delete movie.');
+                console.log('Movies before deletion:', movies);
+                setMovies((prevMovies) => {
+                    const updatedMovies = prevMovies.filter((movie) => movie.movie_id !== movieToDelete);
+                    console.log('Movies after deletion:', updatedMovies);
+                    return updatedMovies;
+                });
+
+                toast.success('Movie deleted successfully.');
+            } catch (error) {
+                console.error('Error deleting movie:', error);
+                toast.error('Failed to delete movie.');
+            } finally {
+                console.log('Closing modal and resetting state...');
+                setIsModalOpen(false);
+                setMovieToDelete(null);
+            }
         }
     };
+
+    console.log('Component re-rendered with movies:', movies);
 
     return (
         <div className='p-8 bg-gradient-to-br from-blue-50 to-purple-50 min-h-screen'>
@@ -223,13 +291,13 @@ const UserMovies: React.FC = () => {
                                             className='border border-gray-400 p-1 rounded w-full mt-2'
                                             placeholder='Producer'
                                         />
-                                        <input
+                                        {/* <input
                                             type='text'
-                                            value={editedMovie.genres.map((g) => g.genre).join(', ')}
-                                            onChange={(e) => handleChange(e.target.value)}
+                                            value={editedMovie.genre ? editedMovie.genre.join(', ') : ''}
+                                            onChange={(e) => handleChange(e, 'genre')}
                                             className='border border-gray-400 p-1 rounded w-full mt-2'
                                             placeholder='Genres (comma-separated)'
-                                        />
+                                        /> */}
                                         <input
                                             type='text'
                                             value={editedMovie.desc}
@@ -262,7 +330,7 @@ const UserMovies: React.FC = () => {
                                             <UserCircle className='w-4 h-4 text-blue-500' />{' '}
                                             {movie.producer}
                                         </p>
-                                        <div className='text-gray-600 flex items-center gap-2'>
+                                        {/* <div className='text-gray-600 flex items-center gap-2'>
                                             <List className='w-4 h-4 text-blue-500' /> Genres:
                                             {movie.genres.length > 0 ? (
                                                 movie.genres.map((genreItem, index) => (
@@ -273,7 +341,7 @@ const UserMovies: React.FC = () => {
                                             ) : (
                                                 <p>No genres available</p>
                                             )}
-                                        </div>
+                                        </div> */}
                                         <p className='text-gray-600 flex items-center gap-2'>
                                             <FileText className='w-4 h-4 text-blue-500' />{' '}
                                             {movie.desc}
@@ -305,7 +373,10 @@ const UserMovies: React.FC = () => {
                                 </button>
                             )}
                             <button
-                                onClick={() => handleDelete(movie.movie_id)}
+                                onClick={() => {
+                                    setMovieToDelete(movie.movie_id);
+                                    setIsModalOpen(true);
+                                }}
                                 className='bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1 rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200'
                             >
                                 <Trash className='w-5 h-5' />
@@ -314,6 +385,14 @@ const UserMovies: React.FC = () => {
                     </div>
                 ))}
             </div>
+
+            {/* Confirmation Modal */}
+            <ConfirmationModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onConfirm={handleDeleteConfirm}
+                message='Are you sure you want to delete this movie? This action cannot be undone.'
+            />
         </div>
     );
 };
