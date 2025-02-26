@@ -1,26 +1,3 @@
-// import { Request, Response } from "express";
-// import { upload } from "../middlewares/fileUploadMiddleware";
-// 
-// export const uploadImage = (req: Request, res: Response) => {
-//     upload.single("image")(req, res, (err) => {
-//         if (err) {
-//             console.error("Upload Error:", err); // 🔍 Log the error
-//             return res.status(500).json({ error: "Error uploading file." });
-//         }
-//         if (!req.file) {
-//             console.error("Upload Error: No file received"); // 🔍 Log missing file
-//             return res.status(400).json({ error: "No file uploaded." });
-//         }
-// 
-//         const fileUrl = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
-// 
-//         res.status(200).json({
-//             message: "File uploaded successfully!",
-//             filePath: fileUrl,
-//         });
-//     });
-// };
-
 import { Request, Response } from "express";
 import multer from "multer";
 import path from "path";
