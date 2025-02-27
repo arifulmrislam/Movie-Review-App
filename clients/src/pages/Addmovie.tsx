@@ -291,9 +291,9 @@ const AddMovie: React.FC = () => {
                             <h2 className='text-2xl font-bold text-green-600 mb-4'>
                                 Movie Added Successfully!
                             </h2>
-                            <p className='text-gray-700'>
+                            {/* <p className='text-gray-700'>
                                 You will be redirected to the homepage shortly.
-                            </p>
+                            </p> */}
                         </div>
                     </div>
                 )}
