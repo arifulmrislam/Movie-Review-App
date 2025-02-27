@@ -102,7 +102,9 @@ const AddMovie: React.FC = () => {
     return (
         <div className='min-h-screen bg-red-100 py-12 px-4 sm:px-6 lg:px-8'>
             <div className='max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-2xl'>
-                <h1 className='text-3xl font-bold mb-8 text-gray-900'>Create Movie</h1>
+                <h1 className='text-3xl font-bold mb-8 text-gray-900'>
+                    Create Movie
+                </h1>
                 <form onSubmit={handleSubmit} className='space-y-6'>
                     <div>
                         <label
@@ -239,13 +241,26 @@ const AddMovie: React.FC = () => {
                         >
                             Thumbnail
                         </label>
-                        <input
-                            type='file'
-                            accept='image/*'
-                            onChange={(e) => setImageFile(e.target.files?.[0] || null)}
-                            required
-                            className='block w-full px-3 py-2.5 border border-gray-300 rounded-lg'
-                        />
+                        <div className='relative w-full border border-gray-300 rounded-lg flex items-center'>
+                            {/* Custom styled button */}
+                            <label
+                                htmlFor='imageFile'
+                                className='bg-red-400 text-white px-4 py-2 rounded-l-lg cursor-pointer hover:bg-red-500 transition-colors duration-200 font-medium shadow-md'
+                            >
+                                Choose File
+                            </label>
+                            {/* Display file name dynamically */}
+                            <span className='px-3 py-2 text-gray-700'>
+                                {imageFile ? imageFile.name : 'No file chosen'}
+                            </span>
+                            <input
+                                type='file'
+                                accept='image/*'
+                                id='imageFile'
+                                onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+                                className='hidden'
+                            />
+                        </div>
                     </div>
 
                     {/* Image preview */}

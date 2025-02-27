@@ -226,19 +226,21 @@ const UserMovies: React.FC = () => {
     return (
         <div className='p-8 bg-gradient-to-br from-blue-50 to-purple-50 min-h-screen'>
             {/* User Profile Section */}
-            <div className='bg-gradient-to-r from-blue-500 to-purple-600 shadow-md rounded-lg p-6 flex flex-col md:flex-row items-center justify-between mb-6'>
+            <div className='bg-white shadow-md rounded-lg p-6 flex flex-col md:flex-row items-center justify-between mb-6 border border-gray-200'>
                 <div className='flex items-center gap-4'>
-                    <div className='w-12 h-12 flex items-center justify-center bg-white text-blue-500 font-bold text-xl rounded-full'>
-                        <User className='w-6 h-6' />
+                    <div className='w-14 h-14 flex items-center justify-center bg-blue-500 text-white font-bold text-xl rounded-full shadow-lg'>
+                        <User className='w-7 h-7' />
                     </div>
-                    <div>
-                        <h2 className='text-lg font-semibold text-white'>{user.name}</h2>
-                        <p className='text-gray-200'>{user.email}</p>
+                    <div className='text-center md:text-left'>
+                        <h2 className='text-lg font-semibold text-gray-900'>
+                            {user.name}
+                        </h2>
+                        <p className='text-gray-600 text-sm'>{user.email}</p>
                     </div>
                 </div>
-                <div className='flex items-center gap-2'>
-                    <span className='text-gray-200'>Movies Added:</span>
-                    <span className='bg-yellow-400 text-black text-xs font-bold rounded-full px-3 py-1'>
+                <div className='flex items-center gap-2 mt-4 md:mt-0'>
+                    <span className='text-gray-700 text-sm'>Movies Added:</span>
+                    <span className='bg-yellow-400 text-gray-900 text-sm font-semibold rounded-full px-3 py-1 shadow-md'>
                         {movies.length}
                     </span>
                 </div>
@@ -316,15 +318,16 @@ const UserMovies: React.FC = () => {
                                 ) : (
                                     <>
                                         <h3 className='text-xl font-semibold text-purple-800 flex items-center gap-2'>
-                                            <Film className='w-5 h-5 text-purple-600' /> {movie.title}
+                                            <Film className='w-5 h-5 text-purple-600' />{' '}
+                                            {movie.title}
                                         </h3>
                                         <p className='text-gray-600 flex items-center gap-2'>
                                             <Calendar className='w-4 h-4 text-blue-500' />{' '}
                                             {movie.release_yr}
                                         </p>
                                         <p className='text-gray-600 flex items-center gap-2'>
-                                            <Clock className='w-4 h-4 text-blue-500' /> {movie.length}{' '}
-                                            minutes
+                                            <Clock className='w-4 h-4 text-blue-500' />{' '}
+                                            {movie.length} minutes
                                         </p>
                                         <p className='text-gray-600 flex items-center gap-2'>
                                             <UserCircle className='w-4 h-4 text-blue-500' />{' '}
@@ -350,7 +353,9 @@ const UserMovies: React.FC = () => {
                                 )}
                                 <p className='text-yellow-500 text-sm flex items-center gap-2'>
                                     ⭐{' '}
-                                    {movie.averageRating ? movie.averageRating.toFixed(1) : 'N/A'}
+                                    {movie.averageRating
+                                        ? movie.averageRating.toFixed(1)
+                                        : 'N/A'}
                                 </p>
                             </div>
                         </div>
