@@ -26,7 +26,7 @@ const Register: React.FC = () => {
         }
         try {
             await register(username, email, password);
-            // navigate('/'); Uncomment to navigate after successful registration
+            navigate('/'); 
         } catch (error) {
             console.error('Registration failed:', error);
             toast.error('Registration failed. Please try again.');

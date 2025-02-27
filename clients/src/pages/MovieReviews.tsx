@@ -15,7 +15,6 @@ interface MovieReviewsProps {
     onReviewAdded: () => void;
 }
 
-// Reusable Confirmation Modal Component
 const ConfirmationModal = ({
     isOpen,
     onClose,
@@ -74,8 +73,9 @@ const MovieReviews: React.FC<MovieReviewsProps> = ({
     const [editMode, setEditMode] = useState(false);
     const [reviewToEdit, setReviewToEdit] = useState<Review | null>(null);
     const [loggedInUserId, setLoggedInUserId] = useState<number | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
-    const [reviewToDelete, setReviewToDelete] = useState<number | null>(null); // State for review to delete
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [reviewToDelete, setReviewToDelete] = useState<number | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchReviews = async () => {
@@ -101,10 +101,11 @@ const MovieReviews: React.FC<MovieReviewsProps> = ({
                 setReviews(formattedReviews);
             } catch (error) {
                 console.error('Error fetching reviews:', error);
+            } finally {
+                setIsLoading(false);
             }
         };
 
-        // Retrieve the logged-in user's ID
         const token = localStorage.getItem('token');
         if (token) {
             try {
@@ -155,7 +156,6 @@ const MovieReviews: React.FC<MovieReviewsProps> = ({
 
             if (!response.ok) throw new Error('Failed to submit review');
 
-            // Fetch updated reviews
             const updatedReviews = await fetch(
                 `http://localhost:3000/api/review?movie_id=${Number(movieId)}`
             );
@@ -164,7 +164,6 @@ const MovieReviews: React.FC<MovieReviewsProps> = ({
 
             const data = await updatedReviews.json();
 
-            // Ensure reviews include user ID for UI updates
             const formattedReviews = Array.isArray(data)
                 ? data.map((review) => ({
                     rr_id: review.rr_id,
@@ -172,14 +171,12 @@ const MovieReviews: React.FC<MovieReviewsProps> = ({
                     review: review.review,
                     user: {
                         name: review.user?.name || 'Unknown',
-                        id: review.user_id || review.user?.id, // Ensure user ID is present
+                        id: review.user_id || review.user?.id,
                     },
                 }))
                 : [];
 
             setReviews(formattedReviews);
-
-            // Trigger movie details update (average rating)
             onReviewAdded();
 
             setComment('');
@@ -240,7 +237,6 @@ const MovieReviews: React.FC<MovieReviewsProps> = ({
             return;
         }
 
-        // Open the confirmation modal
         setReviewToDelete(rr_id);
         setIsModalOpen(true);
     };
@@ -269,7 +265,7 @@ const MovieReviews: React.FC<MovieReviewsProps> = ({
                 );
 
                 toast.success('Review deleted successfully.');
-                onReviewAdded(); // Update average rating
+                onReviewAdded();
             } catch (error) {
                 toast.error('Failed to delete review.');
             } finally {
@@ -280,9 +276,9 @@ const MovieReviews: React.FC<MovieReviewsProps> = ({
     };
 
     return (
-        <div>
+        <div className='container mx-auto px-4 py-8'>
             {/* Review Form */}
-            <div className='max-w-2xl mt-12'>
+            <div className='max-w-2xl mx-auto mt-12'>
                 <form
                     onSubmit={handleReviewSubmit}
                     className='bg-white p-8 rounded-xl shadow-lg'
@@ -300,7 +296,9 @@ const MovieReviews: React.FC<MovieReviewsProps> = ({
                                     key={value}
                                     type='button'
                                     onClick={() => setRating(value)}
-                                    className={`text-3xl ${value <= (rating || 0) ? 'text-yellow-400' : 'text-gray-300'
+                                    className={`text-3xl ${value <= (rating || 0)
+                                            ? 'text-yellow-400'
+                                            : 'text-gray-300'
                                         } hover:text-yellow-500 transition-colors`}
                                 >
                                     ★
@@ -327,7 +325,7 @@ const MovieReviews: React.FC<MovieReviewsProps> = ({
                     </div>
                     <button
                         type='submit'
-                        className='flex items-center gap-2 bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors'
+                        className='flex items-center gap-2 bg-red-500 text-white px-8 py-3 rounded-lg hover:bg-red-600 transition duration-200 shadow-md cursor-pointer'
                     >
                         <Send className='w-5 h-5' />
                         Submit Review
@@ -338,44 +336,52 @@ const MovieReviews: React.FC<MovieReviewsProps> = ({
             {/* Reviews Section */}
             <div className='p-8 bg-gray-50 min-h-screen'>
                 <h2 className='text-3xl font-bold mb-8 text-gray-900'>Reviews</h2>
-                <div className='grid gap-8 md:grid-cols-2'>
-                    {reviews.map((review) => (
-                        <div
-                            key={review.rr_id}
-                            className='p-6 bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow'
-                        >
-                            <div className='flex justify-between items-center'>
-                                <div className='flex items-center'>
-                                    <User className='w-6 h-6 mr-2 text-gray-600' />
-                                    <strong className='text-gray-900'>{review.user?.name}</strong>
-                                </div>
-                                {loggedInUserId === review.user.id && (
-                                    <div className='flex space-x-3'>
-                                        <button
-                                            onClick={() => handleEdit(review.rr_id)}
-                                            className='text-blue-500 hover:text-blue-700 focus:outline-none transition-colors'
-                                        >
-                                            <Edit className='w-5 h-5' />
-                                        </button>
-                                        <button
-                                            onClick={() => handleDelete(review.rr_id)}
-                                            className='text-red-500 hover:text-red-700 focus:outline-none transition-colors'
-                                        >
-                                            <Trash className='w-5 h-5' />
-                                        </button>
+                {isLoading ? (
+                    <div className='flex justify-center items-center'>
+                        <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900'></div>
+                    </div>
+                ) : (
+                    <div className='grid gap-8 md:grid-cols-2'>
+                        {reviews.map((review) => (
+                            <div
+                                key={review.rr_id}
+                                className='p-6 bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow'
+                            >
+                                <div className='flex justify-between items-center'>
+                                    <div className='flex items-center'>
+                                        <User className='w-6 h-6 mr-2 text-gray-600' />
+                                        <strong className='text-gray-900'>
+                                            {review.user?.name}
+                                        </strong>
                                     </div>
-                                )}
-                            </div>
-                            <div className='mt-4'>
-                                <div className='flex items-center gap-2 mb-3'>
-                                    <div className='flex'>{renderStars(review.rating)}</div>
-                                    <span className='text-gray-600'>({review.rating}/5)</span>
+                                    {loggedInUserId === review.user.id && (
+                                        <div className='flex space-x-3'>
+                                            <button
+                                                onClick={() => handleEdit(review.rr_id)}
+                                                className='bg-gradient-to-r from-blue-500 to-blue-600 text-white px-3 py-1 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200'
+                                            >
+                                                <Edit className='w-5 h-5' />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(review.rr_id)}
+                                                className='bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1 rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200'
+                                            >
+                                                <Trash className='w-5 h-5' />
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
-                                <p className='text-gray-700 mb-4'>{review.review}</p>
+                                <div className='mt-4'>
+                                    <div className='flex items-center gap-2 mb-3'>
+                                        <div className='flex'>{renderStars(review.rating)}</div>
+                                        <span className='text-gray-600'>({review.rating}/5)</span>
+                                    </div>
+                                    <p className='text-gray-700 mb-4'>{review.review}</p>
+                                </div>
                             </div>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                )}
             </div>
 
             {/* Confirmation Modal */}
